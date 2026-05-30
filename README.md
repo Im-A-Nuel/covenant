@@ -18,7 +18,7 @@ Agent gets a task → Venice AI plans it
         ↓
 Agent calls an x402 service → 402 Payment Required
         ↓
-Policy Engine checks: budget · per-request · service · purpose · duplicate · expiry
+Policy Engine checks: budget · per-request · service · verified seller · purpose · duplicate · expiry
         ↓
 If approved → redeemDelegations() pays USDC on Base Sepolia
         ↓
@@ -37,6 +37,13 @@ Everything lands in the Audit Trail
 | x402 | `src/app/api/x402/sentiment/route.ts` (real 402 envelope) + `src/lib/x402.ts` |
 | Policy firewall | `src/lib/policy.ts` |
 | Venice AI | `src/app/api/venice/route.ts` + `src/lib/venice.ts` (planner + report) |
+
+## Covenant lifecycle
+
+A covenant is `active`, then becomes `depleted` (budget spent), `expired` (past its duration), or
+`revoked` — the user can revoke at any time from the covenant card, after which the policy engine
+blocks every further payment. Every decision (approved / blocked / needs-user) is recorded in the
+audit trail and can be exported as JSON.
 
 ## Run
 
