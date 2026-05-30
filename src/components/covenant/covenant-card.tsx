@@ -1,9 +1,11 @@
 "use client";
 
-import { Wallet2, Clock, Target, Layers, Link2, ShieldCheck } from "lucide-react";
+import { Wallet2, Clock, Target, Layers, Link2, ShieldCheck, Ban } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { Covenant } from "@/lib/types";
+import { useStore } from "@/lib/store";
 import { shortAddr, formatUSDC, timeAgo } from "@/lib/utils";
 import { explorerAddr } from "@/lib/chain";
 
@@ -15,9 +17,15 @@ const statusTone = {
 } as const;
 
 export function CovenantCard({ covenant }: { covenant: Covenant }) {
+  const { updateCovenant } = useStore();
   const used = covenant.totalBudget - covenant.remainingBudget;
   const pct = covenant.totalBudget > 0 ? (used / covenant.totalBudget) * 100 : 0;
   const real = covenant.delegation?.mode === "real";
+
+  function revoke() {
+    if (!confirm(`Revoke the covenant for "${covenant.agent}"? The agent can no longer spend under it.`)) return;
+    updateCovenant(covenant.id, { status: "revoked" });
+  }
 
   return (
     <Card>
@@ -69,6 +77,14 @@ export function CovenantCard({ covenant }: { covenant: Covenant }) {
                 <Row label="Signature" value={shortAddr(covenant.delegation.signature, 8)} mono />
               </>
             )}
+          </div>
+        )}
+
+        {covenant.status === "active" && (
+          <div className="flex justify-end border-t border-border pt-3">
+            <Button variant="danger" size="sm" onClick={revoke}>
+              <Ban className="h-3.5 w-3.5" /> Revoke covenant
+            </Button>
           </div>
         )}
       </CardContent>
