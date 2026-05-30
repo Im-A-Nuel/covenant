@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { Covenant, AuditEntry } from "./types";
 import type { SignedDelegation } from "./delegation";
+import { COVENANTS, AUDIT } from "./seed";
 
 interface StoreState {
   covenants: Covenant[];
@@ -31,6 +32,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(raw);
         setCovenants(parsed.covenants ?? []);
         setAudit(parsed.audit ?? []);
+      } else {
+        // First load: seed from reference data so dashboards look populated.
+        setCovenants(COVENANTS);
+        setAudit(AUDIT);
       }
     } catch {
       /* ignore */

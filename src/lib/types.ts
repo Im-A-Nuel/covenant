@@ -19,6 +19,10 @@ export interface Covenant {
   /** On-chain delegation metadata (ERC-7710) */
   delegation?: SignedDelegationMeta;
   smartAccount?: Address;
+  /** Display-only accent color for seed/UI cards. */
+  color?: string;
+  /** Number of payments made under this covenant (seed/UI). */
+  payments?: number;
 }
 
 export interface SignedDelegationMeta {
@@ -87,6 +91,8 @@ export interface AuditEntry {
   remainingBudget: number;
   status: "completed" | "blocked" | "pending";
   timestamp: string;
+  /** Human-friendly relative label for seed/UI (e.g. 'just now', '4m ago'). */
+  timeLabel?: string;
 }
 
 export interface AgentStep {
