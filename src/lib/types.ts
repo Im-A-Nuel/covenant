@@ -59,6 +59,8 @@ export interface PaymentRequest {
   purpose: string;
   scheme: string;
   network: string;
+  /** Seller is a verified x402 service (from the 402 envelope's `extra.verified`). */
+  verified: boolean;
   raw402?: unknown;
 }
 

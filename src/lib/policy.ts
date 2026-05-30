@@ -37,6 +37,13 @@ export function evaluatePolicy(
     detail: serviceOk ? `${payment.service} is in allow-list` : `${payment.service} not allowed`,
   });
 
+  const verifiedOk = payment.verified;
+  checks.push({
+    label: "Seller verified",
+    ok: verifiedOk,
+    detail: verifiedOk ? "x402 service is verified" : "seller is not a verified x402 service",
+  });
+
   const purposeOk = !covenant.purpose || covenant.purpose === payment.purpose;
   checks.push({
     label: "Purpose matches covenant",
@@ -65,7 +72,7 @@ export function evaluatePolicy(
   });
 
   const allOk = checks.every((c) => c.ok);
-  const hardFail = !budgetOk || !active || duplicate || !serviceOk || !purposeOk;
+  const hardFail = !budgetOk || !active || duplicate || !serviceOk || !purposeOk || !verifiedOk;
 
   let decision: PolicyResult["decision"];
   let reason: string;

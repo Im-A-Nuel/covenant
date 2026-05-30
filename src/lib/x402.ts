@@ -36,6 +36,7 @@ export async function requestPaidData(
       purpose: accept.extra?.purpose ?? "research-data-purchase",
       scheme: accept.scheme,
       network: accept.network,
+      verified: accept.extra?.verified ?? false,
       raw402: body,
     };
     return { status: "paywall", payment, endpoint };
