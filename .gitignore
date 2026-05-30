@@ -32,6 +32,20 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# AI assistant / local agent files (not for the public repo)
+.claude/
+AGENTS.md
+CLAUDE.md
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
 
 # vercel
 .vercel
