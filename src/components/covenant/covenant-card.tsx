@@ -4,6 +4,7 @@ import { Wallet2, Clock, Target, Layers, Link2, ShieldCheck, Ban } from "lucide-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { OnChainStatus } from "@/components/covenant/onchain-status";
 import type { Covenant } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { shortAddr, formatUSDC, timeAgo } from "@/lib/utils";
@@ -79,6 +80,8 @@ export function CovenantCard({ covenant }: { covenant: Covenant }) {
             )}
           </div>
         )}
+
+        <OnChainStatus covenant={covenant} />
 
         {covenant.status === "active" && (
           <div className="flex justify-end border-t border-border pt-3">

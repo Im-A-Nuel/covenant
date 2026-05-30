@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, custom, http, type Address, type EIP1193Provider, type PublicClient } from "viem";
+import { createPublicClient, createWalletClient, custom, http, erc20Abi, type Address, type EIP1193Provider, type PublicClient } from "viem";
 import { baseSepolia } from "viem/chains";
 
 export const CHAIN = baseSepolia;
@@ -38,6 +38,16 @@ export function getWalletClient(account: Address) {
     account,
     chain: CHAIN,
     transport: custom(provider),
+  });
+}
+
+/** On-chain USDC balance (raw units, 6 decimals) of an address. */
+export async function usdcBalance(address: Address): Promise<bigint> {
+  return publicClient.readContract({
+    address: USDC_ADDRESS,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address],
   });
 }
 
