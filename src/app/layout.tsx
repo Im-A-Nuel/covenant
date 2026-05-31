@@ -28,10 +28,38 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+const SITE_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+const TITLE = "Covenant · Policy-Bound x402 Payments for Autonomous Agents";
+const DESCRIPTION =
+  "Let agents pay, but only under covenant. Policy-bound x402 payments using MetaMask Smart Accounts and ERC-7710 delegated permissions.";
+
 export const metadata: Metadata = {
-  title: "Covenant · Policy-Bound x402 Payments for Autonomous Agents",
-  description:
-    "Let agents pay, but only under covenant. Policy-bound x402 payments using MetaMask Smart Accounts and ERC-7710 delegated permissions.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  applicationName: "Covenant",
+  keywords: [
+    "x402",
+    "ERC-7710",
+    "MetaMask Smart Accounts",
+    "delegated permissions",
+    "autonomous agents",
+    "agent payments",
+    "Venice AI",
+    "Base",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Covenant",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
