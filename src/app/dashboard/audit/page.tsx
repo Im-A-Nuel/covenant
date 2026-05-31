@@ -4,7 +4,8 @@ import * as React from "react";
 import { useStore } from "@/lib/store";
 import { useToast } from "@/components/ui/toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo, shortAddr } from "@/lib/utils";
+import { explorerTx } from "@/lib/chain";
 import type { AuditEntry } from "@/lib/types";
 
 type Filter = "all" | "approved" | "blocked";
@@ -124,6 +125,9 @@ function Row({ a, open, onToggle }: { a: AuditEntry; open: boolean; onToggle: ()
   const ok = a.decision === "approved";
   const time = a.timeLabel ?? timeAgo(a.timestamp);
   const tx = a.transactionHash;
+  const isReal = a.execMode === "real";
+  // A linkable on-chain hash is a full 0x hash (not a truncated/synthetic display string).
+  const fullTx = !!tx && !tx.includes("…") && tx.startsWith("0x") && tx.length >= 42;
 
   return (
     <>
@@ -170,6 +174,13 @@ function Row({ a, open, onToggle }: { a: AuditEntry; open: boolean; onToggle: ()
         </div>
         <div>
           <span className={`pill ${a.decision}`}>{ok ? "Approved" : "Blocked"}</span>
+          {ok && (
+            <div style={{ marginTop: 6 }}>
+              <span className={`settle-badge ${isReal ? "real" : "sim"}`}>
+                {isReal ? "on-chain" : "simulated"}
+              </span>
+            </div>
+          )}
         </div>
         <div className="ex-toggle">
           {time}
@@ -222,12 +233,32 @@ function Row({ a, open, onToggle }: { a: AuditEntry; open: boolean; onToggle: ()
           </div>
           <div>
             <span className="k">Transaction</span>
-            <span className="v mono">{tx ? `${tx} · 1Shot` : "No payment made"}</span>
+            {tx ? (
+              fullTx ? (
+                <a
+                  className="v mono"
+                  href={explorerTx(tx)}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "var(--usdc)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {shortAddr(tx, 6)}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              ) : (
+                <span className="v mono">{tx}</span>
+              )
+            ) : (
+              <span className="v mono">No payment made</span>
+            )}
           </div>
           <div>
             <span className="k">Status</span>
             <span className="v" style={{ color: ok ? "var(--ok)" : "var(--block)" }}>
-              {ok ? "Settled" : "Blocked before execution"}
+              {ok ? (isReal ? "Settled on-chain · verified" : "Settled (simulated)") : "Blocked before execution"}
             </span>
           </div>
         </div>
