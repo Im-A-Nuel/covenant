@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Newsreader, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
@@ -11,12 +11,11 @@ const hanken = Hanken_Grotesk({
   display: "swap",
 });
 
-// Editorial serif for display headings (italics via <i> for the signature swash look)
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+// Geometric grotesk for display headings — the Covenant signature voice
+const display = Space_Grotesk({
+  variable: "--font-display",
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["300", "400", "500"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -66,7 +65,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="en"
-      className={`${hanken.variable} ${newsreader.variable} ${jetbrains.variable}`}
+      className={`${hanken.variable} ${display.variable} ${jetbrains.variable}`}
     >
       <body>
         <Providers>{children}</Providers>

@@ -388,9 +388,8 @@ export default function Landing() {
 
       {/* ============ RESERVE ============ */}
       <section className="sec" id="reserve">
-        <div className="wrap reserve-grid">
-          <div>
-            <h2 className="display">Quick <i>a</i>nswers bef<i>o</i>re you start</h2>
+        <div className="wrap faq-wrap">
+          <h2 className="display">Quick <i>a</i>nswers bef<i>o</i>re you start</h2>
             <dl className="faq">
               {FAQ_ITEMS.map(([q, a], i) => (
                 <React.Fragment key={i}>
@@ -405,42 +404,7 @@ export default function Landing() {
                   </dd>
                 </React.Fragment>
               ))}
-            </dl>
-          </div>
-
-          <div className="vip">
-            <div className="vip-inner" style={{ textAlign: "center" }}>
-              <h3>
-                Put your agents <b>on a covenant</b> today
-              </h3>
-              <p style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.55, margin: "0 0 22px" }}>
-                No waitlist. Connect MetaMask on Base Sepolia, sign a spending policy, and watch your
-                agent pay an x402 service strictly within it.
-              </p>
-              <div style={{ textAlign: "left", margin: "0 0 26px" }}>
-                <div className="check">
-                  <span className="tick">✓</span> Sign a budget, duration, and allowed-services policy
-                </div>
-                <div className="check">
-                  <span className="tick">✓</span> Every payment checked by the policy firewall first
-                </div>
-                <div className="check">
-                  <span className="tick">✓</span> Full audit trail with on-chain proof
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <Link className="btn btn-dark" href="/new">
-                  Get Started{" "}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-                <Link className="btn btn-ghost" href="/dashboard">
-                  Open the dashboard
-                </Link>
-              </div>
-            </div>
-          </div>
+          </dl>
         </div>
       </section>
 
@@ -469,7 +433,7 @@ export default function Landing() {
             <CovenantMark size={30} />
           </div>
           <h2 className="display">R<i>e</i>ady to let your <i>a</i>gents p<i>a</i>y, saf<i>e</i>ly?</h2>
-          <p>Join the early waitlist and get notified the moment Covenant goes live.</p>
+          <p>It runs on Base Sepolia today. Connect your wallet, sign a covenant, and let your agent pay, safely.</p>
           <div className="cta-actions">
             <Link className="btn btn-dark btn-lg" href="/new">
               Get Started{" "}
