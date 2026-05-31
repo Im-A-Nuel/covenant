@@ -301,6 +301,13 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .decision .di{width:40px;height:40px;border-radius:11px;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
 .decision b{font-size:16px;}
 .decision .dsub{font-size:13px;color:var(--ink-2);}
+/* failed policy check + non-approved decisions (firewall block UI) */
+.checks li.fail .ck{background:rgba(207,75,62,.14);}
+.checks li.fail .cv{color:var(--block);}
+.decision.warn{background:rgba(176,137,0,.08);border-color:rgba(176,137,0,.28);}
+.decision.warn .di{background:var(--warn);}
+.decision.blocked{background:rgba(207,75,62,.08);border-color:rgba(207,75,62,.28);}
+.decision.blocked .di{background:var(--block);}
 .pay-line{display:flex;align-items:center;gap:11px;margin-top:13px;font-size:14px;}
 .run-actions{display:flex;gap:12px;margin-top:6px;opacity:0;transition:.4s;}
 .run-actions.in{opacity:1;}

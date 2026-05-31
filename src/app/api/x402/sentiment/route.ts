@@ -112,7 +112,7 @@ function paywall() {
           asset: USDC_ADDRESS,
           assetName: "USDC",
           maxTimeoutSeconds: 120,
-          extra: { decimals: 6, purpose: "research-data-purchase", verified: true },
+          extra: { decimals: 6, purpose: "research-data-purchase", verified: true, service: "market-api.demo" },
         },
       ],
     },

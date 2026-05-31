@@ -24,6 +24,26 @@ export const COVENANTS: Covenant[] = [
     payments: 1,
   },
   {
+    // Active, but intentionally strict: the demo payment (market-api.demo,
+    // research-data-purchase, 0.25 USDC) violates its service allow-list, purpose
+    // and per-request cap — so running a task on it shows the firewall BLOCK live.
+    id: "#005",
+    user: "0x7a3F2c",
+    agent: "Compliance Bot",
+    token: "USDC",
+    totalBudget: 2.0,
+    remainingBudget: 1.5,
+    durationHours: 24,
+    maxPerRequest: 0.1,
+    allowedServices: ["inference.xyz"],
+    purpose: "compliance-audit",
+    createdAt: "2026-05-31T05:00:00Z",
+    expiresAt: "2026-06-01T05:00:00Z",
+    status: "active",
+    color: "#7c5cff",
+    payments: 3,
+  },
+  {
     id: "#002",
     user: "0x7a3F2c",
     agent: "Price Monitor",

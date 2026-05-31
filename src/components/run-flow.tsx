@@ -19,6 +19,8 @@ export interface RunResult {
   service: string;
   txHash?: string;
   report?: string;
+  decision?: "approved" | "needs_user" | "blocked";
+  blocked?: boolean;
 }
 
 type Stage = "plan" | "x402" | "policy" | "settle" | "done";
@@ -38,13 +40,16 @@ interface X402State {
 interface Check {
   label: string;
   detail: string;
+  ok: boolean;
 }
+type Decision = "approved" | "needs_user" | "blocked";
 interface PolicyState {
   checks: Check[];
-  revealed: number; // how many checks are .ok
-  status: "amber" | "green";
+  revealed: number; // how many checks have been evaluated (show ✓/✗)
+  status: "amber" | "green" | "red";
   statusText: string;
   showDecision: boolean;
+  decision: Decision;
 }
 interface SettleState {
   status: "amber" | "green";
@@ -74,6 +79,24 @@ const checkSvg = (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  </svg>
+);
+
+const crossSvg = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <path d="M7 7l10 10M17 7L7 17" stroke="#cf4b3e" strokeWidth="2.6" strokeLinecap="round" />
+  </svg>
+);
+
+const approveIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const blockIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path d="M7 7l10 10M17 7L7 17" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
   </svg>
 );
 
@@ -165,8 +188,9 @@ export function RunFlow({
       let checks: Check[];
       const policyResult = pay ? evaluatePolicy(cov, pay, auditAtMount) : null;
       if (policyResult) {
-        checks = policyResult.checks.map((c: PaymentCheck) => ({ label: c.label, detail: c.detail }));
+        checks = policyResult.checks.map((c: PaymentCheck) => ({ label: c.label, detail: c.detail, ok: c.ok }));
       } else {
+        // No live 402 (offline / fetch failed): show the reference checks as passing.
         checks = [
           ["Budget remaining", `${cov.remainingBudget.toFixed(2)} ≥ ${price.toFixed(2)}`],
           ["Price under max-per-request", `${price.toFixed(2)} ≤ ${cov.maxPerRequest.toFixed(2)}`],
@@ -174,12 +198,13 @@ export function RunFlow({
           ["Purpose matches covenant", cov.purpose],
           ["No duplicate payment", "none found"],
           ["Duration still active", "within window"],
-        ].map(([label, detail]) => ({ label, detail }));
+        ].map(([label, detail]) => ({ label, detail, ok: true }));
       }
+      const decision: Decision = policyResult?.decision ?? "approved";
       if (!alive) return;
 
       setStage("policy");
-      setPolicy({ checks, revealed: 0, status: "amber", statusText: "Checking", showDecision: false });
+      setPolicy({ checks, revealed: 0, status: "amber", statusText: "Checking", showDecision: false, decision });
       await sleep(450);
       for (let i = 0; i < checks.length; i++) {
         if (!alive) return;
@@ -187,10 +212,38 @@ export function RunFlow({
         await sleep(340);
       }
       if (!alive) return;
-      setPolicy((p) => (p ? { ...p, status: "green", statusText: "Approved", showDecision: true } : p));
+      const finalStatus = decision === "approved" ? "green" : decision === "needs_user" ? "amber" : "red";
+      const finalText = decision === "approved" ? "Approved" : decision === "needs_user" ? "Needs approval" : "Blocked";
+      setPolicy((p) => (p ? { ...p, status: finalStatus, statusText: finalText, showDecision: true } : p));
       await sleep(560);
 
-      // ---------- 4. SETTLEMENT ----------
+      // If the firewall did not approve, halt BEFORE any redemption. The payment is
+      // never made; we record a blocked audit entry and stop. This is the covenant
+      // doing its job on-chain rules + off-chain policy, before a token moves.
+      if (decision !== "approved") {
+        if (!alive) return;
+        addAudit({
+          id: uid("aud"),
+          covenantId: cov.id,
+          task,
+          agent: cov.agent,
+          service,
+          resource,
+          amount: price,
+          decision,
+          reason: policyResult?.reason || "Payment held by covenant policy.",
+          execMode: "simulated",
+          remainingBudget: cov.remainingBudget,
+          status: "blocked",
+          timestamp: new Date().toISOString(),
+          timeLabel: "just now",
+        });
+        setStage("done");
+        if (alive) onDone?.({ price, remaining: cov.remainingBudget, service, decision, blocked: true });
+        return;
+      }
+
+      // ---------- 4. SETTLEMENT (only when approved) ----------
       const remaining = Math.max(0, cov.remainingBudget - price);
       setStage("settle");
       setSettle({
@@ -289,7 +342,7 @@ export function RunFlow({
       });
 
       setStage("done");
-      if (alive) onDone?.({ price, remaining, service, txHash: displayHash, report });
+      if (alive) onDone?.({ price, remaining, service, txHash: displayHash, report, decision: "approved", blocked: false });
     })();
 
     return () => {
@@ -395,31 +448,39 @@ export function RunFlow({
           </div>
           <ul className="checks">
             {policy.checks.map((c, i) => {
-              const ok = i < policy.revealed;
+              const evaluated = i < policy.revealed;
+              const cls = evaluated ? (c.ok ? "ok" : "fail") : "";
               return (
-                <li key={i} className={ok ? "ok" : ""}>
-                  <span className="ck">{ok ? checkSvg : <span className="spin" />}</span>
+                <li key={i} className={cls}>
+                  <span className="ck">
+                    {evaluated ? (c.ok ? checkSvg : crossSvg) : <span className="spin" />}
+                  </span>
                   {c.label}
                   <span className="cv">{c.detail}</span>
                 </li>
               );
             })}
           </ul>
-          <div className="decision" style={{ display: policy.showDecision ? "flex" : "none" }}>
-            <span className="di">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12.5l4.2 4.2L19 7"
-                  stroke="#fff"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
+          <div
+            className={`decision ${policy.decision === "blocked" ? "blocked" : policy.decision === "needs_user" ? "warn" : ""}`}
+            style={{ display: policy.showDecision ? "flex" : "none" }}
+          >
+            <span className="di">{policy.decision === "approved" ? approveIcon : blockIcon}</span>
             <div>
-              <b>Approved</b>
-              <div className="dsub">All six checks passed. Payment is within covenant.</div>
+              <b>
+                {policy.decision === "approved"
+                  ? "Approved"
+                  : policy.decision === "needs_user"
+                    ? "Needs your approval"
+                    : "Blocked by covenant"}
+              </b>
+              <div className="dsub">
+                {policy.decision === "approved"
+                  ? "All checks passed. Payment is within the covenant."
+                  : policy.decision === "needs_user"
+                    ? "Price exceeds your per-request limit. Payment held; no funds moved."
+                    : "A covenant rule was violated. Payment blocked; no funds moved."}
+              </div>
             </div>
           </div>
         </div>

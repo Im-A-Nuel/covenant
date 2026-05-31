@@ -10,7 +10,7 @@ interface X402Accept {
   description: string;
   payTo: string;
   asset: string;
-  extra?: { decimals?: number; purpose?: string; verified?: boolean };
+  extra?: { decimals?: number; purpose?: string; verified?: boolean; service?: string };
 }
 
 /** Call the paid service. Returns either the delivered data or a 402 paywall. */
@@ -28,7 +28,11 @@ export async function requestPaidData(
     const price = Number(accept.maxAmountRequired) / 10 ** decimals;
     const payment: PaymentRequest = {
       id: uid("pay"),
-      service: new URL(endpoint, "http://x").pathname.replace("/api/x402/", "").replace(/\//g, "-") + ".demo",
+      // Prefer the service name advertised in the 402 envelope so it can be matched
+      // against the covenant's allow-list; fall back to a name derived from the path.
+      service:
+        accept.extra?.service ||
+        new URL(endpoint, "http://x").pathname.replace("/api/x402/", "").replace(/\//g, "-") + ".demo",
       resource: accept.description,
       price,
       token: "USDC",
