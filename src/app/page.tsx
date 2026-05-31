@@ -84,7 +84,7 @@ const FAQ_ITEMS: [string, string][] = [
   ["What happens when a payment breaks the policy?", "The policy engine blocks it before execution and logs the reason. Borderline cases can be set to require your manual approval instead of failing silently."],
   ["Can I revoke a covenant or change the budget?", "Yes. A covenant can be revoked at any time, and it automatically expires at the end of its duration or once the budget is depleted."],
   ["Which chains and standards does it use?", "Covenant is built on MetaMask Smart Accounts with ERC-7710 delegated permissions, x402 for payments, and an optional 1Shot relayer for gas abstraction on supported EVM chains."],
-  ["When will early access open?", "We're onboarding builders in private beta now. Reserve a slot and you'll be notified the moment your covenant workspace is live."],
+  ["Do I need real funds to try it?", "No. Covenant runs on Base Sepolia testnet. Without a connected wallet it runs in a simulated mode; with one it signs a real ERC-7710 delegation, and on-chain settlement just needs testnet USDC and a little gas."],
 ];
 
 const NAV_SECTIONS = ["why", "who", "features", "reserve"] as const;
@@ -92,8 +92,6 @@ const NAV_SECTIONS = ["why", "who", "features", "reserve"] as const;
 export default function Landing() {
   const [view, setView] = React.useState<"user" | "agent">("user");
   const [openFaq, setOpenFaq] = React.useState(0);
-  const [useOpt, setUseOpt] = React.useState(0);
-  const [reserveLabel, setReserveLabel] = React.useState("Continue to checkout");
   const [activeNav, setActiveNav] = React.useState<string>("why");
 
   // nav active state on scroll
@@ -113,12 +111,6 @@ export default function Landing() {
     return () => io.disconnect();
   }, []);
 
-  function reserveSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setReserveLabel("Slot reserved ✓");
-    setTimeout(() => setReserveLabel("Continue to checkout"), 2200);
-  }
-
   return (
     <div className="landing">
       {/* ============ NAV ============ */}
@@ -133,7 +125,7 @@ export default function Landing() {
             <a href="#why" className={activeNav === "why" ? "active" : undefined}>Why Covenant</a>
             <a href="#who" className={activeNav === "who" ? "active" : undefined}>Who it&apos;s for</a>
             <a href="#features" className={activeNav === "features" ? "active" : undefined}>Features</a>
-            <a href="#reserve" className={activeNav === "reserve" ? "active" : undefined}>Get early access</a>
+            <a href="#reserve" className={activeNav === "reserve" ? "active" : undefined}>FAQ</a>
           </nav>
           <WalletMenu variant="pill" />
         </div>
@@ -197,7 +189,6 @@ export default function Landing() {
             </div>
           </div>
         </div>
-        <div className="wrap"><div className="dots"><i className="on" /><i /><i /><i /><i /></div></div>
       </section>
 
       {/* ============ TRUST STRIP ============ */}
@@ -399,7 +390,7 @@ export default function Landing() {
       <section className="sec" id="reserve">
         <div className="wrap reserve-grid">
           <div>
-            <h2 className="display">Res<i>e</i>rve your cov<i>e</i>nant bef<i>o</i>re the agent economy does</h2>
+            <h2 className="display">Quick <i>a</i>nswers bef<i>o</i>re you start</h2>
             <dl className="faq">
               {FAQ_ITEMS.map(([q, a], i) => (
                 <React.Fragment key={i}>
@@ -418,33 +409,36 @@ export default function Landing() {
           </div>
 
           <div className="vip">
-            <div className="vip-inner">
-              <h3>Early <b>builder access</b> to reserve your covenant slot</h3>
-              <form onSubmit={reserveSubmit}>
-                <div className="frow">
-                  <input className="vfield" placeholder="First name" required />
-                  <input className="vfield" placeholder="Last name" required />
+            <div className="vip-inner" style={{ textAlign: "center" }}>
+              <h3>
+                Put your agents <b>on a covenant</b> today
+              </h3>
+              <p style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.55, margin: "0 0 22px" }}>
+                No waitlist. Connect MetaMask on Base Sepolia, sign a spending policy, and watch your
+                agent pay an x402 service strictly within it.
+              </p>
+              <div style={{ textAlign: "left", margin: "0 0 26px" }}>
+                <div className="check">
+                  <span className="tick">✓</span> Sign a budget, duration, and allowed-services policy
                 </div>
-                <input className="vfield" type="email" placeholder="Enter your email" required />
-                <div className="vhint">Your future sign-in email. This can&apos;t be changed later.</div>
-                <div className="vlabel">What will your first agent be called?</div>
-                <input className="vfield" placeholder="e.g. Research Agent" maxLength={24} />
-                <div className="vhint">Maximum 24 characters.</div>
-                <div className="vlabel">How are you planning to use Covenant?</div>
-                <label className={`radio-opt${useOpt === 0 ? " sel" : ""}`} onClick={() => setUseOpt(0)}>
-                  <input type="radio" name="use" checked={useOpt === 0} readOnly /><span className="ring" /> Build an agent that pays for services
-                </label>
-                <label className={`radio-opt${useOpt === 1 ? " sel" : ""}`} onClick={() => setUseOpt(1)}>
-                  <input type="radio" name="use" checked={useOpt === 1} readOnly /><span className="ring" /> Set spending policy for my team&apos;s agents
-                </label>
-                <button
-                  className="btn btn-dark"
-                  type="submit"
-                  style={reserveLabel.includes("✓") ? { background: "#2f8f5b" } : undefined}
-                >
-                  {reserveLabel}
-                </button>
-              </form>
+                <div className="check">
+                  <span className="tick">✓</span> Every payment checked by the policy firewall first
+                </div>
+                <div className="check">
+                  <span className="tick">✓</span> Full audit trail with on-chain proof
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                <Link className="btn btn-dark" href="/new">
+                  Get Started{" "}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </Link>
+                <Link className="btn btn-ghost" href="/dashboard">
+                  Open the dashboard
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -505,7 +499,7 @@ export default function Landing() {
               <a href="#why">Why Covenant</a>
               <a href="#who">Who it&apos;s for</a>
               <a href="#features">Features</a>
-              <a href="#reserve">Get early access</a>
+              <a href="#reserve">FAQ</a>
             </div>
             <div className="foot-col">
               <h4>Product</h4>

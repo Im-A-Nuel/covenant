@@ -665,6 +665,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .landing header.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);
   backdrop-filter:saturate(140%) blur(14px);border-bottom:1px solid var(--line);}
 .landing .nav-inner{display:flex;align-items:center;gap:32px;height:74px;}
+.landing .nav-inner .wallet-menu{margin-left:auto;}
 .landing .brand{display:flex;align-items:center;gap:11px;font-size:19px;font-weight:600;letter-spacing:-.01em;padding:0;}
 .landing .mark{flex:0 0 auto;}
 .landing .nav-div{width:1px;height:26px;background:var(--line);}
@@ -935,7 +936,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
   .landing .why-cards{grid-template-columns:1fr;}
   .landing h1.hero-h{font-size:46px;} .landing h2.sec-h,.landing .feat h2,.landing .reserve-grid h2{font-size:34px;} .landing .cta h2{font-size:36px;}
   .landing nav.links,.landing .nav-div{display:none;}
-  .landing .hero-visual{order:-1;} .landing .float-card{left:0;}
+  .landing .float-card{left:0;}
   .landing .cats-title{font-size:30px;}
   .landing .foot-bottom{flex-direction:column;gap:16px;align-items:flex-start;}
   .landing .scatter{display:none;}
@@ -949,7 +950,8 @@ h1.ph{font-size:38px;margin:0 0 8px;}
   .landing .hero-cta{flex-direction:column;align-items:stretch;}
   .landing .hero-cta .btn{width:100%;}
   .landing .hero-visual{flex-direction:column;align-items:center;}
-  .landing .cov-card{max-width:100%;}
+  .landing .cov-card{max-width:340px;}
+  .landing .hero-visual .cov-agent{font-size:23px;}
   .landing .float-card{position:static;left:auto;bottom:auto;width:100%;margin-top:14px;}
   .landing .sec{padding:56px 0;}
   .landing h2.sec-h,.landing .feat h2,.landing .reserve-grid h2{font-size:27px;}
