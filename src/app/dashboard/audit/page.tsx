@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useStore } from "@/lib/store";
+import { useToast } from "@/components/ui/toast";
 import { timeAgo } from "@/lib/utils";
 import type { AuditEntry } from "@/lib/types";
 
@@ -9,6 +10,7 @@ type Filter = "all" | "approved" | "blocked";
 
 export default function AuditPage() {
   const { audit } = useStore();
+  const { toast } = useToast();
   const [filter, setFilter] = React.useState<Filter>("all");
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
@@ -29,8 +31,9 @@ export default function AuditPage() {
       a.download = "covenant-audit-log.json";
       a.click();
       URL.revokeObjectURL(url);
+      toast(`Exported ${audit.length} audit entries`);
     } catch {
-      alert("Audit log exported as CSV (demo).");
+      toast("Could not export the audit log", "error");
     }
   }
 

@@ -4,6 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { CovenantCard } from "@/components/covenant-card";
 import { useStore } from "@/lib/store";
+import { useConfirm } from "@/components/ui/confirm";
+import { useToast } from "@/components/ui/toast";
 import type { Covenant, CovenantStatus } from "@/lib/types";
 
 type Filter = "all" | CovenantStatus;
@@ -18,6 +20,8 @@ const TABS: [Filter, string][] = [
 
 export default function CovenantsPage() {
   const { covenants, updateCovenant } = useStore();
+  const confirm = useConfirm();
+  const { toast } = useToast();
   const [filter, setFilter] = React.useState<Filter>("all");
 
   const counts = React.useMemo(() => {
@@ -30,14 +34,16 @@ export default function CovenantsPage() {
 
   const list = covenants.filter((c) => filter === "all" || c.status === filter);
 
-  function revoke(c: Covenant) {
-    if (
-      !confirm(
-        `Revoke Covenant ${c.id} (${c.agent})?\n\nThe agent's delegated permission is cancelled immediately. No further payments can be made.`,
-      )
-    )
-      return;
+  async function revoke(c: Covenant) {
+    const ok = await confirm({
+      title: `Revoke ${c.agent}?`,
+      body: `Covenant ${c.id}'s delegated permission is cancelled immediately. No further payments can be made, and funds never left your wallet.`,
+      confirmLabel: "Revoke covenant",
+      danger: true,
+    });
+    if (!ok) return;
     updateCovenant(c.id, { status: "revoked" });
+    toast(`Covenant ${c.id} revoked`);
   }
 
   return (

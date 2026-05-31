@@ -11,6 +11,7 @@ import { useStore } from "@/lib/store";
 import { createCovenantDelegation } from "@/lib/delegation";
 import type { Covenant } from "@/lib/types";
 import { WalletMenu } from "@/components/wallet-menu";
+import { useToast } from "@/components/ui/toast";
 
 /* ---------- step metadata ---------- */
 const STEPS = [
@@ -102,7 +103,7 @@ export default function NewCovenantPage() {
   /* ---------- step 1 → 2: create + sign covenant ---------- */
   async function createCovenant() {
     if (!services.length) {
-      alert("Select at least one allowed service.");
+      toast("Select at least one allowed service", "error");
       return;
     }
     setSigning(true);
@@ -150,6 +151,7 @@ export default function NewCovenantPage() {
             };
             addCovenant(base, signed);
             setCreated(base);
+            toast(`Covenant ${id} created and signed`);
             goStep(1);
             return;
           }
@@ -175,6 +177,7 @@ export default function NewCovenantPage() {
       };
       addCovenant(base);
       setCreated(base);
+      toast(`Covenant ${id} created`);
       goStep(1);
     } finally {
       setSigning(false);
@@ -205,6 +208,7 @@ export default function NewCovenantPage() {
   const runTx = runResult?.txHash ?? "0x8f3c…a31c";
 
   const [showPreview, setShowPreview] = React.useState(false);
+  const { toast } = useToast();
 
   const panelClass = (i: number) =>
     `panel${currentStep === i ? " on" : ""}${currentStep === i && anim ? " anim" : ""}`;
