@@ -9,7 +9,7 @@ const DEMO_ADDR = "0x7a…3F2c";
 /**
  * Wallet chip / pill that opens a popup with the full address, copy, and
  * connect/disconnect. Used in the landing nav (pill), the dashboard sidebar +
- * mobile top bar, and the wizard sidebar (chip) — so it works on every page.
+ * mobile top bar, and the wizard sidebar (chip), so it works on every page.
  */
 export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) {
   const { account, connect, disconnect, connecting } = useWallet();

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
         text: mockResponse(body.messages, body.json),
         model: "mock-venice",
         mode: "mock",
-        note: `Venice API error ${res.status}: ${errText.slice(0, 140)} — using fallback`,
+        note: `Venice API error ${res.status}: ${errText.slice(0, 140)}; using fallback`,
       });
     }
 
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       text: mockResponse(body.messages, body.json),
       model: "mock-venice",
       mode: "mock",
-      note: `Venice request failed: ${(e as Error).message} — using fallback`,
+      note: `Venice request failed: ${(e as Error).message}; using fallback`,
     });
   }
 }
@@ -94,7 +94,7 @@ function mockResponse(messages: Msg[], json?: boolean): string {
       "",
       "**Verdict:** Medium short-term risk.",
       "",
-      "Free price and on-chain activity were inconclusive on their own, so a paid sentiment report was purchased under the covenant. Social sentiment is mildly negative with elevated derivative funding — consistent with a short-term pullback risk, but no structural red flags.",
+      "Free price and on-chain activity were inconclusive on their own, so a paid sentiment report was purchased under the covenant. Social sentiment is mildly negative with elevated derivative funding, consistent with a short-term pullback risk, but no structural red flags.",
       "",
       "- Liquidity: healthy",
       "- Sentiment: slightly negative (paid signal)",

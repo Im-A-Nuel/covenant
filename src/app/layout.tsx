@@ -29,7 +29,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Covenant — Policy-Bound x402 Payments for Autonomous Agents",
+  title: "Covenant · Policy-Bound x402 Payments for Autonomous Agents",
   description:
     "Let agents pay, but only under covenant. Policy-bound x402 payments using MetaMask Smart Accounts and ERC-7710 delegated permissions.",
 };

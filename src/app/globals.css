@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Covenant — global stylesheet
+   Covenant global stylesheet
    Ported verbatim from the reference (app.css + page inline styles
    + landing). App/dashboard classes are global; landing-only classes
    are scoped under ".landing".
@@ -56,7 +56,7 @@ nav.nav{display:flex;flex-direction:column;gap:2px;}
 .wallet .wmeta small{font-size:11.5px;color:var(--muted);}
 .wallet .wnet{margin-left:auto;font-size:11px;font-weight:700;color:var(--usdc);background:rgba(39,117,202,.1);padding:4px 8px;border-radius:7px;}
 
-/* wallet popup (address + connect/disconnect) — works in every layout */
+/* wallet popup (address + connect/disconnect); works in every layout */
 .wallet-menu{position:relative;}
 .wallet-pop{position:absolute;z-index:80;right:0;top:calc(100% + 8px);width:250px;max-width:80vw;
   background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;
@@ -81,7 +81,7 @@ nav.nav{display:flex;flex-direction:column;gap:2px;}
 .back-home{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px;padding:4px 6px;}
 .back-home:hover{color:var(--ink);}
 
-/* mobile top nav bar + drawer (dashboard) — hidden on desktop, shown ≤1000 */
+/* mobile top nav bar + drawer (dashboard); hidden on desktop, shown ≤1000 */
 .mnav{display:none;}
 
 /* ---------- main ---------- */
@@ -124,7 +124,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
   radial-gradient(120% 130% at 100% 0%,#cfe0c2 0%,transparent 55%),
   linear-gradient(180deg,#faf6f3,#fff);}
 .cov-top.muted-top{background:linear-gradient(180deg,#f6f6f4,#fff);}
-/* per-covenant gradient variants — soft, on-theme; assigned by covenant color/identity */
+/* per-covenant gradient variants: soft, on-theme; assigned by covenant color/identity */
 .cov-top.cg-blue{background:radial-gradient(120% 130% at 0% 0%,#cfe0f5 0%,transparent 55%),radial-gradient(120% 130% at 100% 0%,#e4ddf3 0%,transparent 55%),linear-gradient(180deg,#f7f9fc,#fff);}
 .cov-top.cg-mint{background:radial-gradient(120% 130% at 0% 0%,#d2e8da 0%,transparent 55%),radial-gradient(120% 130% at 100% 0%,#cfe0c2 0%,transparent 55%),linear-gradient(180deg,#f6faf7,#fff);}
 .cov-top.cg-peach{background:radial-gradient(120% 130% at 0% 0%,#f7d9c9 0%,transparent 55%),radial-gradient(120% 130% at 100% 0%,#f0e3c4 0%,transparent 55%),linear-gradient(180deg,#faf6f2,#fff);}
@@ -349,7 +349,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .note-card b{font-weight:600;}
 
 /* ============================================================
-   WIZARD (/new) — step sidebar + builder + run + audit
+   WIZARD (/new): step sidebar + builder + run + audit
    ============================================================ */
 .app.wizard{grid-template-columns:268px 1fr;}
 .app.wizard .side{padding:24px 20px;}
@@ -460,7 +460,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .audit-actions{display:flex;gap:12px;margin-top:26px;}
 
 /* ============================================================
-   media queries — app / dashboard / wizard
+   media queries: app / dashboard / wizard
    ============================================================ */
 @media(max-width:1100px){.cov-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:1080px){
@@ -595,7 +595,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 }
 
 /* ============================================================
-   LANDING — scoped under .landing
+   LANDING: scoped under .landing
    ============================================================ */
 .landing{background:#fff;min-height:100%;}
 .landing{
@@ -715,7 +715,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .landing .fx3{background:linear-gradient(135deg,#fbeee6,#f7e2d4);}
 .landing .why-card:hover .fx [data-pause]{animation-play-state:running;}
 
-/* FX1 — converge into one covenant */
+/* FX1: converge into one covenant */
 .landing .seal{position:relative;z-index:3;width:50px;height:50px;border-radius:14px;background:#fff;
   display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -10px rgba(0,0,0,.25);}
 .landing .seal-ring{position:absolute;z-index:2;width:50px;height:50px;border-radius:50%;border:1.5px solid #2775ca;
@@ -727,7 +727,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .landing .orb.o3{background:#8fb37c;--tx:-58px;--ty:34px;animation-delay:.5s;}
 .landing .orb.o4{background:#b39ddb;--tx:58px;--ty:34px;animation-delay:.75s;}
 
-/* FX2 — payment checked at the gate */
+/* FX2: payment checked at the gate */
 .landing .track2{position:relative;width:200px;height:64px;}
 .landing .gate{position:absolute;left:50%;top:6px;bottom:6px;width:0;border-left:1.5px dashed #2f8f5b;transform:translateX(-50%);}
 .landing .scan{position:absolute;left:50%;top:4px;bottom:4px;width:38px;transform:translateX(-50%);
@@ -740,7 +740,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
   width:26px;height:26px;border-radius:50%;background:#2f8f5b;color:#fff;
   display:flex;align-items:center;justify-content:center;animation:tickpop 3.4s ease-in-out infinite;}
 
-/* FX3 — audit log appends itself */
+/* FX3: audit log appends itself */
 .landing .log{width:188px;display:flex;flex-direction:column;gap:8px;}
 .landing .logrow{display:flex;align-items:center;gap:9px;background:#fff;border-radius:9px;padding:8px 10px;
   box-shadow:0 4px 12px -8px rgba(0,0,0,.2);opacity:0;animation:logappend 4s ease-in-out infinite;}

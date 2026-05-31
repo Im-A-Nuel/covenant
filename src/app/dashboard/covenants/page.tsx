@@ -47,7 +47,7 @@ export default function CovenantsPage() {
           <div className="crumb">Manage</div>
           <h1 className="display ph">Covenants</h1>
           <p>
-            Every spending agreement you&apos;ve signed. Revoke any covenant instantly — funds never
+            Every spending agreement you&apos;ve signed. Revoke any covenant instantly; funds never
             left your wallet.
           </p>
         </div>

@@ -39,7 +39,7 @@ export async function isDeployed(address: Address): Promise<boolean> {
 export async function deploySmartAccount(owner: Address, smartAccount: SmartAccount): Promise<`0x${string}`> {
   const { factory, factoryData } = await smartAccount.getFactoryArgs();
   if (!factory || !factoryData) {
-    throw new Error("No factory args available — the smart account may already be deployed.");
+    throw new Error("No factory args available; the smart account may already be deployed.");
   }
   const walletClient = getWalletClient(owner);
   const hash = await walletClient.sendTransaction({ to: factory, data: factoryData });

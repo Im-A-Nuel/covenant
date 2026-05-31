@@ -2,7 +2,7 @@ import type { Covenant, AuditEntry } from "./types";
 
 /**
  * Seed data ported verbatim from the reference scripts/covenant-data.js (window.COV).
- * createdAt/expiresAt are HARDCODED literal ISO strings — never computed at runtime here.
+ * createdAt/expiresAt are HARDCODED literal ISO strings, never computed at runtime here.
  */
 
 export const COVENANTS: Covenant[] = [
@@ -188,7 +188,7 @@ export const AUDIT: AuditEntry[] = [
     resource: "Spot price feed",
     amount: 0.25,
     decision: "blocked",
-    reason: "Budget depleted — 0.00 remaining",
+    reason: "Budget depleted, 0.00 remaining",
     transactionHash: undefined,
     execMode: "simulated",
     remainingBudget: 0,

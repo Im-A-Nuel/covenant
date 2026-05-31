@@ -1,7 +1,7 @@
 import type { Covenant, PaymentRequest, PolicyResult, PaymentCheck, AuditEntry } from "./types";
 
 /**
- * The Policy Engine — Covenant's payment firewall.
+ * The Policy Engine: Covenant's payment firewall.
  * Every x402 payment request is checked against the user-defined covenant
  * BEFORE any ERC-7710 redemption is attempted.
  */
@@ -81,7 +81,7 @@ export function evaluatePolicy(
     reason = "All policy checks passed. Payment authorized under the covenant.";
   } else if (!perReqOk && !hardFail) {
     decision = "needs_user";
-    reason = "Price exceeds the per-request limit but other checks pass — requires user approval.";
+    reason = "Price exceeds the per-request limit but other checks pass, so it needs user approval.";
   } else {
     decision = "blocked";
     const failed = checks.filter((c) => !c.ok).map((c) => c.label);

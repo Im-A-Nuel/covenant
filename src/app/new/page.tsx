@@ -158,7 +158,7 @@ export default function NewCovenantPage() {
         }
       }
 
-      // Simulated covenant (no wallet / wrong chain / sign failed) — app still runs.
+      // Simulated covenant (no wallet / wrong chain / sign failed); app still runs.
       base.delegation = {
         delegation: {
           delegator: "0xSIMULATED_SMART_ACCOUNT",
@@ -192,7 +192,7 @@ export default function NewCovenantPage() {
     durationHours: durationHours(duration),
     maxPerRequest: maxNum,
     allowedServices: services,
-    purpose: purpose || "—",
+    purpose: purpose || "not set",
     createdAt: "",
     expiresAt: "",
     status: created ? "active" : "active",
@@ -272,8 +272,8 @@ export default function NewCovenantPage() {
                 Define what your <i>a</i>gent can spend
               </h1>
               <p>
-                Set the budget, time window, per-request ceiling and allowed services. Sign once —
-                your agent can never step outside these rules.
+                Set the budget, time window, per-request ceiling and allowed services. Sign once.
+                Your agent can never step outside these rules.
               </p>
             </div>
           </div>
@@ -372,7 +372,7 @@ export default function NewCovenantPage() {
                   {ArrowRight}
                 </button>
                 <span className="note">
-                  Signs an ERC-7710 delegation — no funds leave your wallet.
+                  Signs an ERC-7710 delegation. No funds leave your wallet.
                 </span>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function NewCovenantPage() {
               </h1>
               <p>
                 Describe the job in plain language. The agent plans the work and only reaches for
-                paid data when it&apos;s actually needed — always inside the covenant.
+                paid data when it&apos;s actually needed, always inside the covenant.
               </p>
             </div>
           </div>
@@ -499,7 +499,7 @@ export default function NewCovenantPage() {
               </h1>
               <p>
                 The agent plans, hits a paid x402 endpoint, and Covenant validates the payment
-                against your policy — before a single token moves.
+                against your policy before a single token moves.
               </p>
             </div>
           </div>
@@ -532,7 +532,7 @@ export default function NewCovenantPage() {
                 Every move, <i>a</i>ccounted for
               </h1>
               <p>
-                One signed payment, fully explained — reason, cost, permission used and on-chain
+                One signed payment, fully explained: reason, cost, permission used and on-chain
                 proof. Nothing your agent did is a mystery.
               </p>
             </div>
@@ -566,7 +566,7 @@ export default function NewCovenantPage() {
                     runResult.report
                   ) : (
                     <>
-                      ETH shows <b>elevated short-term risk</b> — paid sentiment data confirmed
+                      ETH shows <b>elevated short-term risk</b>. Paid sentiment data confirmed
                       rising downside pressure over the next 24–48h.
                     </>
                   )}
@@ -618,7 +618,7 @@ export default function NewCovenantPage() {
                 </li>
                 <li>
                   <b>Free data checked</b>
-                  <small>Insufficient — paid data needed</small>
+                  <small>Insufficient · paid data needed</small>
                 </li>
                 <li>
                   <b>402 Payment Required</b>

@@ -18,7 +18,7 @@ const EXAMPLES = [
   "Check gas trends this week",
 ];
 
-/** "24 hours" / "7 days" / "1 hour" — reference-style window label from durationHours. */
+/** "24 hours" / "7 days" / "1 hour" reference-style window label from durationHours. */
 function windowLabel(hours: number): string {
   if (hours % 24 === 0) {
     const d = hours / 24;

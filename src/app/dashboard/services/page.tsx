@@ -8,8 +8,8 @@ export default function ServicesPage() {
           <div className="crumb">Registry</div>
           <h1 className="display ph">x402 services</h1>
           <p>
-            The services your agents can reach. Only verified endpoints can be added to a covenant —
-            everything else is blocked by default.
+            The services your agents can reach. Only verified endpoints can be added to a covenant.
+            Everything else is blocked by default.
           </p>
         </div>
       </div>

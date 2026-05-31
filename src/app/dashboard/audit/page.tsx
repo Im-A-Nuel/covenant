@@ -69,7 +69,7 @@ export default function AuditPage() {
           <div className="crumb">Accountability</div>
           <h1 className="display ph">Audit log</h1>
           <p>
-            Every payment your agents attempted — approved or blocked — with the reason, cost,
+            Every payment your agents attempted, approved or blocked, with the reason, cost,
             permission used and on-chain proof.
           </p>
         </div>
@@ -216,7 +216,7 @@ function Row({ a, open, onToggle }: { a: AuditEntry; open: boolean; onToggle: ()
           </div>
           <div>
             <span className="k">Transaction</span>
-            <span className="v mono">{tx ? `${tx} · 1Shot` : "— no payment made"}</span>
+            <span className="v mono">{tx ? `${tx} · 1Shot` : "No payment made"}</span>
           </div>
           <div>
             <span className="k">Status</span>

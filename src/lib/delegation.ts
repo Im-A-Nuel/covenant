@@ -98,7 +98,7 @@ export async function executeCovenantPayment(
     return {
       mode: "simulated",
       transactionHash: synthetic,
-      note: `On-chain redemption unavailable (${truncate((e as Error).message)}). Settlement simulated — delegation + signature are real.`,
+      note: `On-chain redemption unavailable (${truncate((e as Error).message)}). Settlement simulated. Delegation and signature are real.`,
     };
   }
 }

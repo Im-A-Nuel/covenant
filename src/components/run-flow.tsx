@@ -86,7 +86,7 @@ export function RunFlow({
 }) {
   const { audit, addAudit, updateCovenant, getSigned } = useStore();
   const { account } = useWallet();
-  // Snapshot the audit history at mount — the run is a one-shot effect and the
+  // Snapshot the audit history at mount; the run is a one-shot effect and the
   // policy check only needs the history as it was when the task started.
   const auditAtMount = React.useRef(audit).current;
 
@@ -253,7 +253,7 @@ export function RunFlow({
         resource,
         amount: price,
         decision: "approved",
-        reason: policyResult?.reason || "All policy checks passed — payment within covenant.",
+        reason: policyResult?.reason || "All policy checks passed. Payment within covenant.",
         transactionHash: txHash,
         execMode: signed && account && pay ? "real" : "simulated",
         remainingBudget: remaining,
@@ -317,7 +317,7 @@ export function RunFlow({
             </span>
             <div>
               <h3>402 Payment Required</h3>
-              <div className="rsub">Free data insufficient — paid resource needed</div>
+              <div className="rsub">Free data insufficient · paid resource needed</div>
             </div>
             <span
               className="mono"
@@ -393,7 +393,7 @@ export function RunFlow({
             </span>
             <div>
               <b>Approved</b>
-              <div className="dsub">All six checks passed — payment is within covenant.</div>
+              <div className="dsub">All six checks passed. Payment is within covenant.</div>
             </div>
           </div>
         </div>

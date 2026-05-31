@@ -79,7 +79,7 @@ const fly: Fly[] = [
 ];
 
 const FAQ_ITEMS: [string, string][] = [
-  ["Does Covenant hold or custody my funds?", "No. Covenant never takes custody. Your funds stay in your MetaMask Smart Account — the agent only ever holds a scoped, delegated permission under ERC-7710 that you can revoke."],
+  ["Does Covenant hold or custody my funds?", "No. Covenant never takes custody. Your funds stay in your MetaMask Smart Account. The agent only ever holds a scoped, delegated permission under ERC-7710 that you can revoke."],
   ["What exactly can an agent spend on?", "Only what your covenant allows: verified x402 services you list, under the budget and per-request limits you set, and only for the stated purpose. Everything else is blocked."],
   ["What happens when a payment breaks the policy?", "The policy engine blocks it before execution and logs the reason. Borderline cases can be set to require your manual approval instead of failing silently."],
   ["Can I revoke a covenant or change the budget?", "Yes. A covenant can be revoked at any time, and it automatically expires at the end of its duration or once the budget is depleted."],
@@ -145,7 +145,7 @@ export default function Landing() {
           <div className="hero-copy">
             <div className="badge"><span className="dot" /> Best x402 + ERC-7710 · Private beta</div>
             <h1 className="display hero-h">Let <i>a</i>gents p<i>a</i>y. But only und<i>e</i>r cov<i>e</i>nant.</h1>
-            <p className="hero-sub">Grant limited spending permissions to autonomous AI agents — budget, duration, allowed services, purpose — all enforced before a single payment ever executes.</p>
+            <p className="hero-sub">Grant limited spending permissions to autonomous AI agents (budget, duration, allowed services, purpose), all enforced before a single payment ever executes.</p>
             <div className="hero-cta">
               <Link className="btn btn-dark btn-lg" href="/new">
                 Get Started{" "}
@@ -227,7 +227,7 @@ export default function Landing() {
                 <span className="seal"><svg width="22" height="22" viewBox="0 0 30 30" fill="none"><path d="M12.4 6.5C8.6 9 8.6 21 12.4 23.5" stroke="#0c0c0d" strokeWidth="1.8" strokeLinecap="round" /><path d="M17.6 6.5C21.4 9 21.4 21 17.6 23.5" stroke="#0c0c0d" strokeWidth="1.8" strokeLinecap="round" /><circle cx="15" cy="15" r="2.8" fill="#0c0c0d" /></svg></span>
               </div>
               <h3>One Covenant for Everything</h3>
-              <p>Budget, duration, allowed services, max-per-request and purpose — defined once, in a single signed agreement.</p>
+              <p>Budget, duration, allowed services, max-per-request and purpose, defined once in a single signed agreement.</p>
             </div>
             <div className="why-card">
               <div className="fx fx2" aria-hidden="true">
@@ -239,7 +239,7 @@ export default function Landing() {
                 </div>
               </div>
               <h3>Spend Within the Rules</h3>
-              <p>Every x402 request is checked against your policy — price, service, purpose, duplicates — before it can execute.</p>
+              <p>Every x402 request is checked against your policy (price, service, purpose, duplicates) before it can execute.</p>
             </div>
             <div className="why-card">
               <div className="fx fx3" aria-hidden="true">
@@ -250,7 +250,7 @@ export default function Landing() {
                 </div>
               </div>
               <h3>A Trail You Can Trust</h3>
-              <p>Every action logged with reason, cost, permission used, and transaction proof — no payment is ever a mystery.</p>
+              <p>Every action logged with reason, cost, permission used, and transaction proof. No payment is ever a mystery.</p>
             </div>
           </div>
 
@@ -298,7 +298,7 @@ export default function Landing() {
             </div>
             <div className="bcard b-lilac">
               <h3>Policy Decision Panel</h3>
-              <p>Watch each request approved, blocked, or escalated — in real time.</p>
+              <p>Watch each request approved, blocked, or escalated, in real time.</p>
               <div className="stage">
                 <div className="decision">
                   <div className="dec-h"><b>0.25 USDC · ETH sentiment</b><span className="badge-ok">Approved</span></div>
@@ -369,7 +369,7 @@ export default function Landing() {
             </div>
             <div className="bcard b-peach">
               <h3>Delegated Execution</h3>
-              <p>Settle the payment with delegated permission — no full wallet access.</p>
+              <p>Settle the payment with delegated permission. No full wallet access.</p>
               <div className="stage">
                 <div className="decision">
                   <div className="dec-h"><b>Executing payment</b><span className="badge-ok">Settled</span></div>
@@ -381,7 +381,7 @@ export default function Landing() {
             </div>
             <div className="bcard b-mint">
               <h3>Final Report</h3>
-              <p>Use the paid resource to generate the answer — and hand back the receipt.</p>
+              <p>Use the paid resource to generate the answer, then hand back the receipt.</p>
               <div className="stage">
                 <div className="audit">
                   <div className="arow"><span className="k">Output</span><span className="v">ETH: short-term risk ↑</span></div>
@@ -426,7 +426,7 @@ export default function Landing() {
                   <input className="vfield" placeholder="Last name" required />
                 </div>
                 <input className="vfield" type="email" placeholder="Enter your email" required />
-                <div className="vhint">Your future sign-in email — this can&apos;t be changed later.</div>
+                <div className="vhint">Your future sign-in email. This can&apos;t be changed later.</div>
                 <div className="vlabel">What will your first agent be called?</div>
                 <input className="vfield" placeholder="e.g. Research Agent" maxLength={24} />
                 <div className="vhint">Maximum 24 characters.</div>
@@ -474,7 +474,7 @@ export default function Landing() {
           <div className="cta-logo">
             <CovenantMark size={30} />
           </div>
-          <h2 className="display">R<i>e</i>ady to let your <i>a</i>gents p<i>a</i>y — saf<i>e</i>ly?</h2>
+          <h2 className="display">R<i>e</i>ady to let your <i>a</i>gents p<i>a</i>y, saf<i>e</i>ly?</h2>
           <p>Join the early waitlist and get notified the moment Covenant goes live.</p>
           <div className="cta-actions">
             <Link className="btn btn-dark btn-lg" href="/new">
@@ -498,7 +498,7 @@ export default function Landing() {
           <div className="foot-grid">
             <div className="foot-brand">
               <CovenantMark size={34} className="mark" />
-              <p className="foot-note">Covenant controls how agents spend — the safety layer for the autonomous agent economy. <a href="#top">Built for the x402 + ERC-7710 track.</a></p>
+              <p className="foot-note">Covenant controls how agents spend. The safety layer for the autonomous agent economy. <a href="#top">Built for the x402 + ERC-7710 track.</a></p>
             </div>
             <div className="foot-col">
               <h4>Sitemap</h4>

@@ -6,7 +6,7 @@ export const CHAIN = baseSepolia;
 /** Circle USDC on Base Sepolia */
 export const USDC_ADDRESS: Address = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
-/** Public RPC — overridable via env */
+/** Public RPC, overridable via env */
 const RPC_URL =
   process.env.NEXT_PUBLIC_RPC_URL && process.env.NEXT_PUBLIC_RPC_URL.length > 0
     ? process.env.NEXT_PUBLIC_RPC_URL

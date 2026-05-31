@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 
 /* ---------- stat card icons (verbatim from Dashboard.html) ---------- */
 const STAT_ICONS: Record<string, React.ReactNode> = {
-  // budget remaining — covenant bounds ( ) embracing a coin
+  // budget remaining: covenant bounds ( ) embracing a coin
   blue: (
     <>
       <path d="M8.4 5.2C5.2 8 5.2 16 8.4 18.8" />
@@ -17,7 +17,7 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
       <path d="M13.2 10.6c-.4-.4-.8-.6-1.4-.6-.8 0-1.3.4-1.3 1 0 1.3 2.7.6 2.7 1.9 0 .6-.6 1-1.3 1-.6 0-1-.2-1.4-.6" />
     </>
   ),
-  // active covenants — a signed seal: card + ( • ) + signature line
+  // active covenants: a signed seal, card + ( • ) + signature line
   green: (
     <>
       <rect x="4" y="3.6" width="16" height="16.8" rx="3.2" />
@@ -27,7 +27,7 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
       <path d="M8.6 17h6.8" />
     </>
   ),
-  // spent last 24h — a spend gauge / meter
+  // spent last 24h: a spend gauge / meter
   amber: (
     <>
       <path d="M4.6 16.2a7.4 7.4 0 0 1 14.8 0" />
@@ -36,7 +36,7 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
       <path d="M4.7 16.2h1.4M17.9 16.2h1.4M12 8.6v1.4" />
     </>
   ),
-  // payments approved — covenant gate ( ✓ )
+  // payments approved: covenant gate ( ✓ )
   lilac: (
     <>
       <path d="M7.2 4.6C3.8 8 3.8 16 7.2 19.4" />
@@ -166,7 +166,7 @@ export default function Dashboard() {
           <div className="crumb">Workspace</div>
           <h1 className="display ph">Welcome back</h1>
           <p>
-            Two covenants are active. Your agents have spent 0.50 USDC in the last 24 hours — every
+            Two covenants are active. Your agents have spent 0.50 USDC in the last 24 hours, every
             payment inside policy.
           </p>
         </div>
@@ -209,7 +209,7 @@ export default function Dashboard() {
         <div className="chart-head">
           <div>
             <h2>Spending under covenant</h2>
-            <p>Approved spend stays below your per-day policy ceiling — every day this week.</p>
+            <p>Approved spend stays below your per-day policy ceiling, every day this week.</p>
           </div>
           <div className="chart-legend">
             <span className="lg">
