@@ -18,6 +18,23 @@ function windowLabel(hours: number): string {
   return `${hours} ${hours === 1 ? "hour" : "hours"}`;
 }
 
+/** Soft, on-theme header gradient that differs per covenant (by its color identity, else a stable hash). */
+const GRADS = ["cg-blue", "cg-mint", "cg-peach", "cg-lilac", "cg-sky"] as const;
+const COLOR_GRAD: Record<string, string> = {
+  "#2775ca": "cg-blue",
+  "#2f8f5b": "cg-mint",
+  "#b08900": "cg-peach",
+  "#7e57c2": "cg-lilac",
+};
+function gradClass(c: Covenant): string {
+  const col = c.color?.toLowerCase();
+  if (col && COLOR_GRAD[col]) return COLOR_GRAD[col];
+  const key = `${c.id ?? ""}${c.agent ?? ""}`;
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return GRADS[h % GRADS.length];
+}
+
 export function CovenantCard({
   covenant,
   footer,
@@ -35,7 +52,7 @@ export function CovenantCard({
 
   return (
     <div className={`cov-card${isDim ? " dim" : ""}`}>
-      <div className={`cov-top${isActive ? "" : " muted-top"}`}>
+      <div className={`cov-top ${gradClass(c)}`}>
         <div className="cov-top-row">
           <div className="cov-id">
             <CovenantMark size={15} /> Covenant&nbsp;{c.id}

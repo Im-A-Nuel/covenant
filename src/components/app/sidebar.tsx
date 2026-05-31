@@ -1,11 +1,11 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CovenantMark } from "@/components/covenant-mark";
 import { useStore } from "@/lib/store";
-import { useWallet } from "@/lib/wallet";
-import { shortAddr } from "@/lib/utils";
+import { WalletMenu } from "@/components/wallet-menu";
 
 interface NavItem {
   href: string;
@@ -14,10 +14,16 @@ interface NavItem {
   count?: number | string;
 }
 
+const PlusIcon = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
 export function Sidebar() {
   const pathname = usePathname();
   const { covenants } = useStore();
-  const { account } = useWallet();
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   const items: NavItem[] = [
     {
@@ -63,58 +69,99 @@ export function Sidebar() {
     },
   ];
 
-  const walletAddr = account ? shortAddr(account) : "0x7a…3F2c";
+  const isActive = (href: string) =>
+    href === "/dashboard"
+      ? pathname === "/dashboard"
+      : pathname === href || pathname.startsWith(href + "/");
+
+  const navLinks = (onNavigate?: () => void) =>
+    items.map((item) => (
+      <Link
+        key={item.href}
+        className={`navitem ${isActive(item.href) ? "active" : ""}`}
+        href={item.href}
+        onClick={onNavigate}
+      >
+        <svg
+          width="19"
+          height="19"
+          viewBox="0 0 24 24"
+          fill="none"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {item.icon}
+        </svg>
+        {item.label}
+        {item.count !== undefined && item.count !== "" ? (
+          <span className="count">{item.count}</span>
+        ) : null}
+      </Link>
+    ));
 
   return (
-    <aside className="side">
-      <Link className="brand" href="/">
-        <CovenantMark size={28} className="mark" />
-        Covenant
-      </Link>
-      <div className="side-label">Workspace</div>
-      <nav className="nav">
-        {items.map((item) => {
-          const active =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link key={item.href} className={`navitem ${active ? "active" : ""}`} href={item.href}>
-              <svg
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {item.icon}
-              </svg>
-              {item.label}
-              {item.count !== undefined && item.count !== "" ? (
-                <span className="count">{item.count}</span>
-              ) : null}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="side-foot">
-        <Link className="btn btn-dark" href="/new" style={{ width: "100%" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          New covenant
+    <>
+      {/* ===== desktop sidebar ===== */}
+      <aside className="side dash-side">
+        <Link className="brand" href="/">
+          <CovenantMark size={28} className="mark" />
+          Covenant
         </Link>
-        <div className="wallet">
-          <span className="wdot"></span>
-          <span className="wmeta">
-            <b>{walletAddr}</b>
-            <small>MetaMask Smart Account</small>
-          </span>
-          <span className="wnet">Base</span>
+        <div className="side-label">Workspace</div>
+        <nav className="nav">{navLinks()}</nav>
+        <div className="side-foot">
+          <Link className="btn btn-dark" href="/new" style={{ width: "100%" }}>
+            {PlusIcon}
+            New covenant
+          </Link>
+          <WalletMenu variant="chip" />
         </div>
-      </div>
-    </aside>
+      </aside>
+
+      {/* ===== mobile top bar + drawer ===== */}
+      <header className={`mnav${menuOpen ? " open" : ""}`}>
+        <div className="mnav-bar">
+          <Link className="brand" href="/" onClick={() => setMenuOpen(false)}>
+            <CovenantMark size={26} className="mark" />
+            Covenant
+          </Link>
+          <div className="mnav-right">
+            <WalletMenu variant="chip" />
+            <button
+              type="button"
+              className="mnav-burger"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              {menuOpen ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+        {menuOpen && (
+          <nav className="mnav-drawer">
+            {navLinks(() => setMenuOpen(false))}
+            <Link
+              className="btn btn-dark"
+              href="/new"
+              style={{ width: "100%" }}
+              onClick={() => setMenuOpen(false)}
+            >
+              {PlusIcon}
+              New covenant
+            </Link>
+          </nav>
+        )}
+      </header>
+    </>
   );
 }

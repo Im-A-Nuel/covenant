@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { RunFlow } from "@/components/run-flow";
+import { IconCoin, IconLimit, IconClock, IconTarget, IconCheck } from "@/components/icons";
 import type { Covenant } from "@/lib/types";
 
 const DEFAULT_TASK =
@@ -161,25 +162,25 @@ function ConsolePage() {
               <>
                 <h4>Active covenant · {sel.id}</h4>
                 <div className="grow">
-                  <span className="gi">$</span> Budget left
+                  <span className="gi"><IconCoin /></span> Budget left
                   <span className="gv">{sel.remainingBudget.toFixed(2)} USDC</span>
                 </div>
                 <div className="grow">
-                  <span className="gi">⛔</span> Max / request
+                  <span className="gi"><IconLimit /></span> Max / request
                   <span className="gv">{sel.maxPerRequest.toFixed(2)} USDC</span>
                 </div>
                 <div className="grow">
-                  <span className="gi">⏱</span> Window
+                  <span className="gi"><IconClock /></span> Window
                   <span className="gv">{windowLabel(sel.durationHours)}</span>
                 </div>
                 <div className="grow">
-                  <span className="gi">◎</span> Purpose
+                  <span className="gi"><IconTarget /></span> Purpose
                   <span className="gv" style={{ fontSize: "12px" }}>
                     {sel.purpose}
                   </span>
                 </div>
                 <div className="grow">
-                  <span className="gi">✓</span> Allowed
+                  <span className="gi"><IconCheck /></span> Allowed
                   <span className="gv" style={{ fontSize: "12px" }}>
                     {sel.allowedServices.join(", ")}
                   </span>

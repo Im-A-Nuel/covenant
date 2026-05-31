@@ -3,15 +3,15 @@
 import * as React from "react";
 import Link from "next/link";
 import { CovenantMark } from "@/components/covenant-mark";
-import { useWallet } from "@/lib/wallet";
-import { shortAddr } from "@/lib/utils";
+import { WalletMenu } from "@/components/wallet-menu";
+import { IconBot, IconCoin, IconClock, IconLimit } from "@/components/icons";
 
 /* ---- agent categories marquee ---- */
 const cats: [string, string][] = [
   ["Research agents", "#dbe7f6"], ["Trading bots", "#e8e0f6"], ["Data pipelines", "#e2efe5"],
   ["DAO operations", "#fbe7dd"], ["Inference apps", "#f6e2ea"], ["Dev tooling", "#e7eaee"],
-  ["API marketplaces", "#e3f0ef"], ["Enterprise workflows", "#efeada"], ["Onchain analysts", "#dfe9f4"],
-  ["Autonomous shoppers", "#f5e3da"], ["Indexers", "#e6e2f3"], ["Monitoring agents", "#e1efe2"],
+  ["API marketplaces", "#e3f0ef"], ["Content agents", "#efeada"], ["Onchain analysts", "#dfe9f4"],
+  ["Autonomous shoppers", "#f5e3da"], ["Voice assistants", "#e6e2f3"], ["Monitoring agents", "#e1efe2"],
 ];
 
 function CatTile({ label, c }: { label: string; c: string }) {
@@ -90,14 +90,11 @@ const FAQ_ITEMS: [string, string][] = [
 const NAV_SECTIONS = ["why", "who", "features", "reserve"] as const;
 
 export default function Landing() {
-  const { account, connect } = useWallet();
   const [view, setView] = React.useState<"user" | "agent">("user");
   const [openFaq, setOpenFaq] = React.useState(0);
   const [useOpt, setUseOpt] = React.useState(0);
   const [reserveLabel, setReserveLabel] = React.useState("Continue to checkout");
   const [activeNav, setActiveNav] = React.useState<string>("why");
-
-  const connected = !!account;
 
   // nav active state on scroll
   React.useEffect(() => {
@@ -138,21 +135,7 @@ export default function Landing() {
             <a href="#features" className={activeNav === "features" ? "active" : undefined}>Features</a>
             <a href="#reserve" className={activeNav === "reserve" ? "active" : undefined}>Get early access</a>
           </nav>
-          <button
-            className={`btn btn-dark wallet-btn${connected ? " connected" : ""}`}
-            onClick={() => connect()}
-          >
-            {connected ? (
-              <span className="wdot" />
-            ) : (
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                <path d="M3 7.5A2.5 2.5 0 015.5 5H18a1 1 0 011 1v1.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" />
-                <rect x="3" y="7" width="18" height="12" rx="2.5" stroke="#fff" strokeWidth="1.7" />
-                <circle cx="16.5" cy="13" r="1.5" fill="#fff" />
-              </svg>
-            )}
-            <span>{connected ? shortAddr(account) : "Connect Wallet"}</span>
-          </button>
+          <WalletMenu variant="pill" />
         </div>
       </header>
 
@@ -306,10 +289,10 @@ export default function Landing() {
                 <div className="phone">
                   <div className="notch" />
                   <div className="ph-statbar"><span>9:41</span><span>＋ New Covenant</span></div>
-                  <div className="ui-row"><span className="uic">🤖</span><span className="uik">Agent</span><span className="uiv">Research Agent</span></div>
-                  <div className="ui-row"><span className="uic">$</span><span className="uik">Budget</span><span className="uiv">3.00 USDC</span></div>
-                  <div className="ui-row"><span className="uic">⏱</span><span className="uik">Duration</span><span className="uiv">24 hours</span></div>
-                  <div className="ui-row"><span className="uic">⛔</span><span className="uik">Max / request</span><span className="uiv">0.50 USDC</span></div>
+                  <div className="ui-row"><span className="uic"><IconBot /></span><span className="uik">Agent</span><span className="uiv">Research Agent</span></div>
+                  <div className="ui-row"><span className="uic"><IconCoin /></span><span className="uik">Budget</span><span className="uiv">3.00 USDC</span></div>
+                  <div className="ui-row"><span className="uic"><IconClock /></span><span className="uik">Duration</span><span className="uiv">24 hours</span></div>
+                  <div className="ui-row"><span className="uic"><IconLimit /></span><span className="uik">Max / request</span><span className="uiv">0.50 USDC</span></div>
                 </div>
               </div>
             </div>
@@ -525,9 +508,9 @@ export default function Landing() {
               <a href="#reserve">Get early access</a>
             </div>
             <div className="foot-col">
-              <h4>Contact</h4>
-              <a href="#reserve">Join the waitlist</a>
+              <h4>Product</h4>
               <Link href="/dashboard">Open the app</Link>
+              <Link href="/new">Create a covenant</Link>
             </div>
           </div>
           <div className="foot-bottom">

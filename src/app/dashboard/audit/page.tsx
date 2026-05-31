@@ -54,6 +54,14 @@ export default function AuditPage() {
         .lrow .chev{transition:transform .2s;}
         .lrow.open .chev{transform:rotate(180deg);}
         .clickable{cursor:pointer;}
+        @media(max-width:720px){
+          .lrow.head{display:none;}
+          .lrow{grid-template-columns:1fr;gap:6px;padding:14px 16px;}
+          .lrow .ex-toggle{justify-content:flex-start;}
+          .detail{padding:0 16px;}
+          .detail.open{max-height:600px;}
+          .detail-in{grid-template-columns:1fr;gap:12px;}
+        }
       `}</style>
 
       <div className="page-head">

@@ -5,11 +5,12 @@ import Link from "next/link";
 import { CovenantMark } from "@/components/covenant-mark";
 import { CovenantCard } from "@/components/covenant-card";
 import { RunFlow, type RunResult } from "@/components/run-flow";
+import { IconCoin, IconLimit, IconClock, IconTarget } from "@/components/icons";
 import { useWallet } from "@/lib/wallet";
 import { useStore } from "@/lib/store";
 import { createCovenantDelegation } from "@/lib/delegation";
 import type { Covenant } from "@/lib/types";
-import { shortAddr } from "@/lib/utils";
+import { WalletMenu } from "@/components/wallet-menu";
 
 /* ---------- step metadata ---------- */
 const STEPS = [
@@ -197,12 +198,13 @@ export default function NewCovenantPage() {
     status: created ? "active" : "active",
   };
 
-  const walletAddr = account ? shortAddr(account) : "0x7a…3F2c";
   const runCovenant = created ?? previewCovenant;
   const remaining = runResult?.remaining ?? Math.max(0, (created?.totalBudget ?? budgetNum) - 0.25);
   const runPrice = runResult?.price ?? 0.25;
   const runService = runResult?.service ?? "market-api.demo";
   const runTx = runResult?.txHash ?? "0x8f3c…a31c";
+
+  const [showPreview, setShowPreview] = React.useState(false);
 
   const panelClass = (i: number) =>
     `panel${currentStep === i ? " on" : ""}${currentStep === i && anim ? " anim" : ""}`;
@@ -243,14 +245,7 @@ export default function NewCovenantPage() {
           })}
         </ul>
         <div className="side-foot">
-          <div className="wallet">
-            <span className="wdot"></span>
-            <span className="wmeta">
-              <b>{walletAddr}</b>
-              <small>MetaMask Smart Account</small>
-            </span>
-            <span className="wnet">Base</span>
-          </div>
+          <WalletMenu variant="chip" />
           <Link className="back-home" href="/">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <path
@@ -386,6 +381,30 @@ export default function NewCovenantPage() {
               <div className="pv-label">Live preview</div>
               <CovenantCard covenant={previewCovenant} dim={false} />
             </div>
+
+            {/* mobile-only: floating button opens the live preview as a popup */}
+            <button type="button" className="preview-fab" onClick={() => setShowPreview(true)}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" stroke="#fff" strokeWidth="1.7" strokeLinejoin="round" />
+                <circle cx="12" cy="12" r="2.6" stroke="#fff" strokeWidth="1.7" />
+              </svg>
+              Live preview
+            </button>
+            {showPreview && (
+              <div className="preview-modal" onClick={() => setShowPreview(false)}>
+                <div className="preview-sheet" onClick={(e) => e.stopPropagation()}>
+                  <div className="preview-sheet-head">
+                    <span className="pv-label" style={{ margin: 0 }}>Live preview</span>
+                    <button type="button" className="preview-close" aria-label="Close" onClick={() => setShowPreview(false)}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                  <CovenantCard covenant={previewCovenant} dim={false} />
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -449,19 +468,19 @@ export default function NewCovenantPage() {
             <aside className="guard">
               <h4>Active covenant</h4>
               <div className="grow">
-                <span className="gi">$</span> Budget
+                <span className="gi"><IconCoin /></span> Budget
                 <span className="gv">{fmt(runCovenant.totalBudget)}</span>
               </div>
               <div className="grow">
-                <span className="gi">⛔</span> Max / request
+                <span className="gi"><IconLimit /></span> Max / request
                 <span className="gv">{fmt(runCovenant.maxPerRequest)}</span>
               </div>
               <div className="grow">
-                <span className="gi">⏱</span> Window
+                <span className="gi"><IconClock /></span> Window
                 <span className="gv">{duration}</span>
               </div>
               <div className="grow">
-                <span className="gi">◎</span> Purpose
+                <span className="gi"><IconTarget /></span> Purpose
                 <span className="gv" style={{ fontSize: "12.5px" }}>
                   {runCovenant.purpose}
                 </span>
