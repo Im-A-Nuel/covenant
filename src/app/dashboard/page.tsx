@@ -3,6 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { CovenantCard } from "@/components/covenant-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CountUp } from "@/components/ui/count-up";
 import { useStore } from "@/lib/store";
 
 /* ---------- stat card icons (verbatim from Dashboard.html) ---------- */
@@ -104,7 +106,9 @@ const AREA = LINE + ` L${cx(CHART_DATA.length - 1).toFixed(1)},${(PT + IH).toFix
 const GY = [0, 0.5, 1.0, 1.5];
 
 export default function Dashboard() {
-  const { covenants, audit } = useStore();
+  const { covenants, audit, ready } = useStore();
+
+  if (!ready) return <DashboardSkeleton />;
 
   const active = covenants.filter((c) => c.status === "active");
   const remaining = active.reduce((s, c) => s + c.remainingBudget, 0);
@@ -121,14 +125,14 @@ export default function Dashboard() {
   }[] = [
     {
       c: "blue",
-      v: remaining.toFixed(2),
+      v: <CountUp end={remaining} decimals={2} />,
       u: "USDC",
       l: "budget remaining",
       sub: `across ${active.length} active covenants`,
     },
     {
       c: "green",
-      v: active.length,
+      v: <CountUp end={active.length} />,
       u: "",
       l: "active covenants",
       sub: (
@@ -139,14 +143,14 @@ export default function Dashboard() {
     },
     {
       c: "amber",
-      v: spent24.toFixed(2),
+      v: <CountUp end={spent24} decimals={2} />,
       u: "USDC",
       l: "spent · last 24h",
       sub: "all within policy",
     },
     {
       c: "lilac",
-      v: payments,
+      v: <CountUp end={payments} />,
       u: "",
       l: "payments approved",
       sub: `${blocked} blocked by firewall`,
@@ -426,6 +430,56 @@ export default function Dashboard() {
                 );
               })}
             </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <>
+      <div className="page-head">
+        <div className="ph-l">
+          <Skeleton style={{ width: 90, height: 12, marginBottom: 13 }} />
+          <Skeleton style={{ width: 220, height: 32, marginBottom: 10, borderRadius: 10 }} />
+          <Skeleton style={{ width: "min(56ch, 100%)", height: 16 }} />
+        </div>
+      </div>
+      <div className="stats">
+        {[0, 1, 2, 3].map((i) => (
+          <div className="stat" key={i}>
+            <Skeleton style={{ width: 38, height: 38, borderRadius: 11, marginBottom: 18 }} />
+            <Skeleton style={{ width: 96, height: 26, marginBottom: 9, borderRadius: 7 }} />
+            <Skeleton style={{ width: "80%", height: 13 }} />
+          </div>
+        ))}
+      </div>
+      <div className="chart-card">
+        <Skeleton style={{ width: 200, height: 18, marginBottom: 8 }} />
+        <Skeleton style={{ width: 280, height: 13, marginBottom: 20 }} />
+        <Skeleton style={{ width: "100%", height: 200, borderRadius: 14 }} />
+      </div>
+      <div className="dash-grid">
+        <div className="section">
+          <Skeleton style={{ width: 150, height: 18, marginBottom: 16 }} />
+          <div className="cov-mini-grid">
+            <Skeleton style={{ width: "100%", height: 300, borderRadius: 22 }} />
+          </div>
+        </div>
+        <div className="section">
+          <Skeleton style={{ width: 130, height: 18, marginBottom: 16 }} />
+          <div className="panel-card" style={{ padding: 16 }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 0" }}>
+                <Skeleton style={{ width: 36, height: 36, borderRadius: 10 }} />
+                <div style={{ flex: 1 }}>
+                  <Skeleton style={{ width: "70%", height: 13, marginBottom: 7 }} />
+                  <Skeleton style={{ width: "45%", height: 11 }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

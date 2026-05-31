@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { CovenantCard } from "@/components/covenant-card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useStore } from "@/lib/store";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
@@ -19,7 +20,7 @@ const TABS: [Filter, string][] = [
 ];
 
 export default function CovenantsPage() {
-  const { covenants, updateCovenant } = useStore();
+  const { covenants, updateCovenant, ready } = useStore();
   const confirm = useConfirm();
   const { toast } = useToast();
   const [filter, setFilter] = React.useState<Filter>("all");
@@ -31,6 +32,8 @@ export default function CovenantsPage() {
     );
     return o;
   }, [covenants]);
+
+  if (!ready) return <CovenantsSkeleton />;
 
   const list = covenants.filter((c) => filter === "all" || c.status === filter);
 
@@ -129,6 +132,26 @@ export default function CovenantsPage() {
             );
           })
         )}
+      </div>
+    </>
+  );
+}
+
+function CovenantsSkeleton() {
+  return (
+    <>
+      <div className="page-head">
+        <div className="ph-l">
+          <Skeleton style={{ width: 70, height: 12, marginBottom: 13 }} />
+          <Skeleton style={{ width: 200, height: 32, marginBottom: 10, borderRadius: 10 }} />
+          <Skeleton style={{ width: "min(60ch, 100%)", height: 16 }} />
+        </div>
+      </div>
+      <Skeleton style={{ width: 320, height: 42, borderRadius: 12, marginBottom: 24 }} />
+      <div className="cov-grid">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} style={{ width: "100%", height: 360, borderRadius: 22 }} />
+        ))}
       </div>
     </>
   );

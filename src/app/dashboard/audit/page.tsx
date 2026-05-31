@@ -3,16 +3,19 @@
 import * as React from "react";
 import { useStore } from "@/lib/store";
 import { useToast } from "@/components/ui/toast";
+import { Skeleton } from "@/components/ui/skeleton";
 import { timeAgo } from "@/lib/utils";
 import type { AuditEntry } from "@/lib/types";
 
 type Filter = "all" | "approved" | "blocked";
 
 export default function AuditPage() {
-  const { audit } = useStore();
+  const { audit, ready } = useStore();
   const { toast } = useToast();
   const [filter, setFilter] = React.useState<Filter>("all");
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
+
+  if (!ready) return <AuditSkeleton />;
 
   const counts = {
     all: audit.length,
@@ -228,6 +231,42 @@ function Row({ a, open, onToggle }: { a: AuditEntry; open: boolean; onToggle: ()
             </span>
           </div>
         </div>
+      </div>
+    </>
+  );
+}
+
+function AuditSkeleton() {
+  return (
+    <>
+      <div className="page-head">
+        <div className="ph-l">
+          <Skeleton style={{ width: 120, height: 12, marginBottom: 13 }} />
+          <Skeleton style={{ width: 180, height: 32, marginBottom: 10, borderRadius: 10 }} />
+          <Skeleton style={{ width: "min(64ch, 100%)", height: 16 }} />
+        </div>
+      </div>
+      <Skeleton style={{ width: 220, height: 42, borderRadius: 12, marginBottom: 24 }} />
+      <div className="panel-card" style={{ padding: "8px 22px" }}>
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              gap: 14,
+              alignItems: "center",
+              padding: "16px 0",
+              borderBottom: i < 5 ? "1px solid var(--line-2)" : "none",
+            }}
+          >
+            <Skeleton style={{ width: 34, height: 34, borderRadius: 10 }} />
+            <div style={{ flex: 1 }}>
+              <Skeleton style={{ width: "55%", height: 14, marginBottom: 7 }} />
+              <Skeleton style={{ width: "35%", height: 12 }} />
+            </div>
+            <Skeleton style={{ width: 80, height: 24, borderRadius: 999 }} />
+          </div>
+        ))}
       </div>
     </>
   );
