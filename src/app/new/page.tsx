@@ -634,7 +634,7 @@ export default function NewCovenantPage() {
                 </li>
                 <li>
                   <b>Payment settled</b>
-                  <small>ERC-7710 · relayed via 1Shot</small>
+                  <small>ERC-7710 · redeemed via DelegationManager</small>
                 </li>
                 <li>
                   <b>Report delivered</b>

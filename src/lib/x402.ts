@@ -45,10 +45,50 @@ export async function requestPaidData(
   return { status: "ok", data };
 }
 
-/** Re-request the resource with a payment proof (tx hash) in the X-PAYMENT header. */
-export async function settleAndDeliver(endpoint: string, paymentProof: string): Promise<unknown> {
+export interface DeliveryResult {
+  delivered: boolean;
+  /** Server confirmed the payment settled on-chain (real USDC transfer to the seller). */
+  verified: boolean;
+  settlement: "on-chain" | "unverified";
+  payer?: string;
+  amountVerified?: string;
+  verifyNote?: string;
+  resource?: unknown;
+  raw: unknown;
+}
+
+/**
+ * Re-request the resource with a payment proof (redemption tx hash) in the
+ * X-PAYMENT header. The server verifies the proof on-chain and returns whether
+ * settlement was real ("on-chain") or could not be verified ("unverified").
+ */
+export async function settleAndDeliver(endpoint: string, paymentProof: string): Promise<DeliveryResult> {
   const res = await fetch(endpoint, {
     headers: { accept: "application/json", "x-payment": paymentProof },
   });
-  return res.json();
+  const body = (await res.json().catch(() => ({}))) as {
+    paid?: boolean;
+    verified?: boolean;
+    settlement?: "on-chain" | "unverified";
+    payer?: string;
+    amountVerified?: string;
+    verifyNote?: string;
+    resource?: unknown;
+  };
+
+  // Strict mode keeps the paywall up (402) when the payment can't be verified.
+  if (res.status === 402) {
+    return { delivered: false, verified: false, settlement: "unverified", raw: body };
+  }
+
+  return {
+    delivered: !!body.paid,
+    verified: !!body.verified,
+    settlement: body.settlement ?? "unverified",
+    payer: body.payer,
+    amountVerified: body.amountVerified,
+    verifyNote: body.verifyNote,
+    resource: body.resource,
+    raw: body,
+  };
 }

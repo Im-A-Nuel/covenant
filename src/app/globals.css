@@ -367,6 +367,32 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .guard .grow .gv{margin-left:auto;font-weight:600;text-align:right;}
 .label{display:block;font-size:13.5px;font-weight:600;margin-bottom:11px;}
 
+/* settlement honesty badge (run flow + readiness panel) */
+.settle-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap;}
+.settle-badge.real{background:rgba(47,143,91,.13);color:#2f8f5b;}
+.settle-badge.sim{background:var(--chip);color:var(--muted-2);}
+
+/* settlement readiness panel (inside the console guard) */
+.ready{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);min-width:0;}
+.ready-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ready-head h4{margin:0;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted-2);}
+.ready-head .settle-badge{margin-left:auto;}
+.ready-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;}
+.ready-dot.ok{background:#2f8f5b;}
+.ready-dot.warn{background:#b08900;}
+.ready-sub{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 12px;}
+.ready-rows{display:flex;flex-direction:column;}
+.ready-row{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line-2);min-width:0;}
+.ready-row:last-child{border-bottom:none;}
+.ready-row .rk{color:var(--muted);flex:0 0 auto;}
+.ready-row .rv{margin-left:auto;font-weight:600;text-align:right;display:inline-flex;align-items:center;gap:8px;min-width:0;}
+.ready-row a.rv{color:var(--usdc);text-decoration:none;}
+.ready-act{font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;}
+.ready-act:disabled{opacity:.5;cursor:not-allowed;}
+.ready-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.ready-refresh{font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;}
+.ready-refresh:disabled{opacity:.5;cursor:not-allowed;}
+
 /* ============================================================
    AUDIT LOG page-specific
    ============================================================ */

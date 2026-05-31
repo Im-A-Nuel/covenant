@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { RunFlow } from "@/components/run-flow";
+import { SettlementReadiness } from "@/components/settlement-readiness";
 import { IconCoin, IconLimit, IconClock, IconTarget, IconCheck } from "@/components/icons";
 import type { Covenant } from "@/lib/types";
 
@@ -185,6 +186,7 @@ function ConsolePage() {
                     {sel.allowedServices.join(", ")}
                   </span>
                 </div>
+                <SettlementReadiness covenant={sel} />
               </>
             )}
           </aside>

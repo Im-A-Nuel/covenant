@@ -91,6 +91,12 @@ export async function executeCovenantPayment(
         },
       ]
     );
+    // Wait for the redemption to mine so the x402 server can verify the USDC
+    // transfer on-chain. A reverted receipt is treated as a failed redemption.
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+    if (receipt.status !== "success") {
+      throw new Error("redemption reverted on-chain");
+    }
     return { mode: "real", transactionHash: txHash };
   } catch (e) {
     // Graceful fallback: keep the real signed delegation, simulate settlement.

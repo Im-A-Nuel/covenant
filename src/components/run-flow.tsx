@@ -54,6 +54,8 @@ interface SettleState {
   service: string;
   txHash: string;
   remaining: number;
+  mode: "real" | "simulated";
+  verified: boolean;
 }
 
 const REFERENCE_PLAN = (cov: Covenant, service: string): string[] => [
@@ -199,10 +201,14 @@ export function RunFlow({
         service,
         txHash: "0x8f3c…a31c",
         remaining,
+        mode: "simulated",
+        verified: false,
       });
 
-      // Run the real redemption when a signed delegation exists, else simulated.
-      let txHash = "0x8f3c…a31c";
+      // Redeem the ERC-7710 delegation on-chain when a signed delegation exists
+      // for this covenant (created with a real wallet this session); else simulate.
+      let proofHash = "0x8f3c…a31c"; // synthetic display fallback
+      let redeemMode: "real" | "simulated" = "simulated";
       const signed = getSigned(cov.id);
       try {
         if (signed && account && pay) {
@@ -212,27 +218,47 @@ export function RunFlow({
             pay.payTo as `0x${string}`,
             price
           );
-          txHash = shortAddr(result.transactionHash, 4);
+          proofHash = result.transactionHash;
+          redeemMode = result.mode;
         }
       } catch {
-        /* keep simulated hash */
+        /* keep simulated fallback */
       }
+
+      // Re-request the resource with the redemption hash as proof; the x402 server
+      // verifies the USDC transfer on-chain. `verified` is the source of truth.
+      let delivery: Awaited<ReturnType<typeof settleAndDeliver>> | null = null;
+      if (pay && endpoint) {
+        try {
+          delivery = await settleAndDeliver(endpoint, proofHash);
+        } catch {
+          /* delivery optional */
+        }
+      }
+      const verified = !!delivery?.verified;
+      const execMode = redeemMode === "real" && verified ? "real" : "simulated";
+      const displayHash = proofHash.length > 14 ? shortAddr(proofHash, 4) : proofHash;
+
       await sleep(1300);
       if (!alive) return;
       setSettle((s) =>
-        s ? { ...s, status: "green", statusText: "Settled", done: true, txHash } : s
+        s
+          ? {
+              ...s,
+              status: "green",
+              statusText: "Settled",
+              done: true,
+              txHash: displayHash,
+              mode: execMode,
+              verified,
+            }
+          : s
       );
 
       // ---------- finalize: report + audit + budget ----------
       let report: string | undefined;
       try {
-        let paidData: string | null = null;
-        if (pay && endpoint) {
-          const delivered = await settleAndDeliver(endpoint, txHash);
-          paidData = JSON.stringify(
-            (delivered as { resource?: unknown }).resource ?? delivered
-          );
-        }
+        const paidData = delivery?.resource ? JSON.stringify(delivery.resource) : null;
         const r = await generateReport(task, paidData, cov);
         report = r.report;
       } catch {
@@ -254,8 +280,8 @@ export function RunFlow({
         amount: price,
         decision: "approved",
         reason: policyResult?.reason || "All policy checks passed. Payment within covenant.",
-        transactionHash: txHash,
-        execMode: signed && account && pay ? "real" : "simulated",
+        transactionHash: proofHash,
+        execMode,
         remainingBudget: remaining,
         status: "completed",
         timestamp: new Date().toISOString(),
@@ -263,7 +289,7 @@ export function RunFlow({
       });
 
       setStage("done");
-      if (alive) onDone?.({ price, remaining, service, txHash, report });
+      if (alive) onDone?.({ price, remaining, service, txHash: displayHash, report });
     })();
 
     return () => {
@@ -422,7 +448,7 @@ export function RunFlow({
             </span>
             <div>
               <h3>Delegated payment</h3>
-              <div className="rsub">ERC-7710 permission · relayed via 1Shot</div>
+              <div className="rsub">ERC-7710 redemption · DelegationManager</div>
             </div>
             <span className={`rstat pstat ${settle.status}`}>{settle.statusText}</span>
           </div>
@@ -447,6 +473,9 @@ export function RunFlow({
                 {settle.txHash}
               </span>{" "}
               · {settle.remaining.toFixed(2)} USDC left
+              <span className={`settle-badge ${settle.mode === "real" && settle.verified ? "real" : "sim"}`}>
+                {settle.mode === "real" && settle.verified ? "on-chain · verified" : "simulated"}
+              </span>
             </div>
           ) : (
             <div className="pay-line">
