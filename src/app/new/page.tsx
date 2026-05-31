@@ -133,7 +133,8 @@ export default function NewCovenantPage() {
         try {
           const sa = await ensureSmartAccount();
           if (sa) {
-            const signed = await createCovenantDelegation(sa, account, budgetNum);
+            const expiresAtSec = Math.floor(new Date(base.expiresAt).getTime() / 1000);
+            const signed = await createCovenantDelegation(sa, account, budgetNum, expiresAtSec);
             base.smartAccount = sa.address;
             base.delegation = {
               delegation: {
@@ -376,7 +377,7 @@ export default function NewCovenantPage() {
                   {ArrowRight}
                 </button>
                 <span className="note">
-                  Signs an ERC-7710 delegation. No funds leave your wallet.
+                  Signs an ERC-7710 delegation. Budget and expiry are enforced on-chain. No funds leave your wallet.
                 </span>
               </div>
             </div>

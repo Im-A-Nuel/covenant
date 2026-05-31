@@ -19,16 +19,20 @@ export interface SignedDelegation {
 
 /**
  * Create + sign a Covenant: an ERC-7710 delegation from the user's smart account
- * to the agent's executor, scoped to spend at most `budgetUSDC` of USDC.
- * The on-chain caveat (erc20TransferAmount) is the HARD cap; the off-chain
- * policy engine enforces the finer rules (per-request, service, purpose...).
+ * to the agent's executor. Two enforcers are baked in ON-CHAIN:
+ *   - erc20TransferAmount  -> hard total budget cap (cannot be exceeded)
+ *   - timestamp            -> the covenant's expiry (redemption rejected after it)
+ * The off-chain policy engine enforces the finer rules (per-request, service,
+ * purpose, duplicates). Signing triggers a real MetaMask EIP-712 signature.
  *
- * Signing triggers a real MetaMask EIP-712 signature.
+ * `expiresAtSec` is a unix timestamp in seconds; when omitted, no expiry caveat
+ * is attached (budget cap only).
  */
 export async function createCovenantDelegation(
   smartAccount: SmartAccount,
   delegate: Address,
-  budgetUSDC: number
+  budgetUSDC: number,
+  expiresAtSec?: number
 ): Promise<SignedDelegation> {
   const delegation = createDelegation({
     environment: smartAccount.environment,
@@ -39,6 +43,15 @@ export async function createCovenantDelegation(
       tokenAddress: USDC_ADDRESS,
       maxAmount: toUnits(budgetUSDC),
     },
+    // Enforce the covenant window on-chain: the DelegationManager rejects any
+    // redemption after `beforeThreshold`, even if our policy engine is bypassed.
+    ...(expiresAtSec && expiresAtSec > 0
+      ? {
+          caveats: [
+            { type: "timestamp" as const, afterThreshold: 0, beforeThreshold: Math.floor(expiresAtSec) },
+          ],
+        }
+      : {}),
   });
 
   const signature = await smartAccount.signDelegation({ delegation });
