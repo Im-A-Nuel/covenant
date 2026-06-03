@@ -12,6 +12,9 @@ enforced by MetaMask's audited smart contracts, not by our code.
 
 **Tracks:** Best x402 + ERC-7710 · Best Agent · Best use of Venice AI
 
+📚 **Full documentation:** see [`docs/`](./docs/) — background, problem, solution, architecture, the
+two-layer security model, technical reference, the x402 ↔ ERC-7710 integration, demo guide, and roadmap.
+
 ## Two layers of defense
 
 Covenant enforces the policy in two places, so a bypass of one is still caught by the other:
