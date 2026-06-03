@@ -1,4 +1,4 @@
-# 04 · Architecture
+# System Architecture
 
 > A single full-stack **Next.js 16** app. **No separate backend, no custom Solidity.** The backend is
 > Next.js API routes; the on-chain contracts are MetaMask's audited, pre-deployed ones on Base Sepolia.
@@ -84,7 +84,7 @@ src/
    └─ ui/                              button / toast / confirm / skeleton primitives
 ```
 
-A module-by-module reference is in [07 · Technical reference](./07-technical-reference.md).
+A module-by-module reference is in [Technical Reference](technical-reference.md).
 
 ## Tech stack
 
@@ -97,12 +97,12 @@ A module-by-module reference is in [07 · Technical reference](./07-technical-re
 | AI | **Venice AI** | Task planning + report generation, proxied server-side (mock fallback). |
 | Network | **Base Sepolia** | OP-stack L2 testnet; **USDC** (6 decimals) is the payment asset. |
 
-## Client/server boundary
+## Client / server boundary
 
-- **Client (`"use client"`)** — everything stateful or wallet-touching: the dashboard pages,
+* **Client (`"use client"`)** — everything stateful or wallet-touching: the dashboard pages,
   `run-flow.tsx`, `WalletProvider`, `StoreProvider`. The wallet signature and the `redeemDelegations`
   call run here, in the user's browser, through MetaMask.
-- **Server (API routes)** — the Venice proxy (keeps `VENICE_API_KEY` off the client) and the x402
+* **Server (API routes)** — the Venice proxy (keeps `VENICE_API_KEY` off the client) and the x402
   service (issues the 402 envelope and performs the **on-chain payment verification**). Secrets and
   verification logic stay server-side.
 
@@ -111,9 +111,5 @@ A module-by-module reference is in [07 · Technical reference](./07-technical-re
 `store.tsx` keeps covenants and the audit log in `localStorage` under **`covenant_state_v2`**, seeding
 from `seed.ts` on first load. **Signed delegations are deliberately not persisted** — they live in a
 runtime ref and are lost on reload, so a real on-chain redemption only works in the session that created
-the covenant. This is a security choice (raw signatures should not sit in `localStorage`), detailed in
-[07 · Technical reference](./07-technical-reference.md#state--persistence).
-
----
-
-**Next:** [05 · How it works →](./05-how-it-works.md)
+the covenant. This is a security choice, detailed in
+[Technical Reference → State & persistence](technical-reference.md#state--persistence).

@@ -1,4 +1,4 @@
-# 05 · How it works
+# How It Works
 
 > One run, from "user signs a covenant" to "report + audit." The staged UI in `run-flow.tsx` mirrors
 > these steps one card at a time, each with a `real` / `on-chain` / `simulated` badge.
@@ -15,12 +15,12 @@ sequenceDiagram
   participant DM as DelegationManager
   participant Chain as Base Sepolia
 
-  User->>Agent: sign covenant (ERC-7710 delegation: budget + expiry caveats)
+  User->>Agent: sign covenant (ERC-7710: budget + expiry caveats)
   User->>Agent: give a task
   Agent->>Venice: planTask(task, covenant)
   Venice-->>Agent: step-by-step plan
   Agent->>X402: GET /api/x402/sentiment
-  X402-->>Agent: 402 Payment Required (envelope: price, asset, payTo, purpose, service, verified)
+  X402-->>Agent: 402 Payment Required (envelope)
   Agent->>Policy: evaluatePolicy(covenant, payment, history)
   alt blocked (a hard rule failed)
     Policy-->>Agent: BLOCKED — stop, no funds move, audit it
@@ -83,32 +83,10 @@ else                             decision = "blocked";     // a hard rule was vi
 The "needs approval" pause is implemented as a promise the staged run awaits; the **Approve once & pay**
 / **Cancel** buttons resolve it. The per-request check still renders a red ✗ even after approval — the
 rule genuinely failed; the user simply chose to override it that one time. See the
-[security model](./06-security-model.md#soft-vs-hard-the-per-request-override) for why this override is safe.
+[security model](security-model.md#soft-vs-hard-the-per-request-override) for why this override is safe.
 
-## Real vs simulated
+## Honesty
 
-Covenant is honest about what is on-chain versus simulated, and shows a badge at every step. The
-settlement badge is derived as:
-
-```ts
-const verified = !!delivery?.verified;                         // server confirmed the USDC transfer
-const execMode = redeemMode === "real" && verified ? "real" : "simulated";
-```
-
-| Condition | What is real | Badge |
-| --- | --- | --- |
-| No wallet connected | Nothing on-chain; the flow is demonstrated end-to-end. | `simulated` |
-| Wallet on Base Sepolia, covenant signed | Smart-account derivation, the delegation, **all caveats**, and the **EIP-712 signature**. | signature is **real** |
-| Above + smart account **deployed & funded** | The `redeemDelegations` tx broadcasts, the receipt is awaited, and the seller verifies the USDC transfer. | `on-chain · verified` |
-| Broadcast happened but the seller couldn't verify, or the account is undeployed/unfunded | Delegation + signature still real; settlement falls back. | `simulated` |
-
-The audit log marks an entry `on-chain` **only** when the redemption broadcast succeeded **and** the
-seller verified the payment. The transaction field links to BaseScan only for a full, real `0x` hash —
-never for a synthetic display string. Nothing pretends to be on-chain when it isn't.
-
-> Want to force honesty even harder? Set `X402_REQUIRE_ONCHAIN=true` and the x402 server keeps the
-> paywall (402) up until a payment is **verified on-chain** — see the [demo guide](./09-demo-guide.md).
-
----
-
-**Next:** [06 · Security model →](./06-security-model.md)
+Covenant is explicit about what is on-chain versus simulated, with a badge at every step. A settlement
+is marked `on-chain` **only** when the redemption broadcast succeeded **and** the seller verified the
+transfer. This deserves its own page → [Real vs Simulated](real-vs-simulated.md).

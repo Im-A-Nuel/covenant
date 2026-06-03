@@ -1,4 +1,4 @@
-# 01 · Background
+# Background
 
 > The context Covenant is built into: autonomous agents are starting to *transact*, and the rails for
 > letting them do so safely have only just arrived.
@@ -17,7 +17,7 @@ a wallet"; it is **give the agent a wallet with rules that hold even when the ag
 
 ## The three rails that make this possible now
 
-Covenant sits at the intersection of three technologies that each matured recently:
+Covenant sits at the intersection of three technologies that each matured recently.
 
 ### 1. x402 — paying over HTTP
 
@@ -52,18 +52,14 @@ cheap and fast enough for sub-dollar, pay-per-call economics.
 
 Each rail is necessary but not sufficient:
 
-- **x402 alone** gives an agent a way to pay, but no notion of a *budget* or *policy* — nothing stops it
+* **x402 alone** gives an agent a way to pay, but no notion of a *budget* or *policy* — nothing stops it
   from paying for the wrong thing, too often, or too much.
-- **ERC-7710 alone** gives you on-chain spending limits, but no connection to the *act of paying for a
+* **ERC-7710 alone** gives you on-chain spending limits, but no connection to the *act of paying for a
   service*, and only coarse limits (a budget cap, a time window) — not "only these services," "only for
   this purpose," "not the same thing twice."
-- **A smart account alone** holds funds; it does not decide *whether a given payment is allowed*.
+* **A smart account alone** holds funds; it does not decide *whether a given payment is allowed*.
 
 The interesting work — and Covenant's contribution — is **composing them into a single, coherent safety
 model**: the x402 envelope drives the ERC-7710 redemption, on-chain caveats enforce the hard limits, and
 an off-chain policy engine enforces the intent-level rules. That composition is the subject of the rest
-of these docs.
-
----
-
-**Next:** [02 · Problem →](./02-problem.md)
+of these docs, starting with [The Problem](the-problem.md).

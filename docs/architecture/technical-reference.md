@@ -1,4 +1,4 @@
-# 07 · Technical reference
+# Technical Reference
 
 > Module-by-module reference, the data model, the API routes, configuration, and state/persistence.
 > File paths are relative to `src/`.
@@ -35,21 +35,21 @@ viem `publicClient` and a wallet-client factory for **Base Sepolia**, the **USDC
 
 `evaluatePolicy(covenant, payment, history)` — a pure function returning
 `{ decision, checks[], reason }`. The seven checks and the decision logic are documented in
-[05 · How it works](./05-how-it-works.md#the-three-decisions) and
-[06 · Security model](./06-security-model.md#layer-2--off-chain-policy-firewall). Runs before any
-redemption is attempted.
+[How It Works → The three decisions](../core-concepts/how-it-works.md#the-three-decisions) and
+[Security model → Layer 2](../core-concepts/security-model.md#layer-2--off-chain-policy-firewall). Runs
+before any redemption is attempted.
 
 ## `app/api/x402/sentiment/route.ts` — the paid service
 
 The demo x402-enabled API with **real on-chain verification**.
 
-- `GET` **without** `X-PAYMENT` → **HTTP 402** with an x402 `accepts[]` envelope:
+* `GET` **without** `X-PAYMENT` → **HTTP 402** with an x402 `accepts[]` envelope:
   `scheme: "exact"`, `network: "base-sepolia"`, `maxAmountRequired`, `payTo`, `asset: USDC`, and
   `extra: { decimals, purpose, verified, service }`.
-- `GET` **with** `X-PAYMENT: <txHash>` → `verifyPayment` fetches the receipt and looks for a USDC
+* `GET` **with** `X-PAYMENT: <txHash>` → `verifyPayment` fetches the receipt and looks for a USDC
   `Transfer` to `PAY_TO` for **≥ the price**:
-  - **found** → `settlement: "on-chain"`, returns the resource.
-  - **not found / not a real tx** → `settlement: "unverified"`, returns the resource anyway (honest
+  * **found** → `settlement: "on-chain"`, returns the resource.
+  * **not found / not a real tx** → `settlement: "unverified"`, returns the resource anyway (honest
     dual-mode) **unless** `X402_REQUIRE_ONCHAIN=true`, in which case the **paywall (402) stays up**.
 
 Constants: `PRICE_USDC = 0.25`, `PAY_TO = (X402_PAY_TO || 0x…dEaD)`, `REQUIRE_ONCHAIN`.
@@ -69,8 +69,8 @@ when unset — so the app runs with no key.
 
 ## `lib/wallet.tsx` / `lib/store.tsx` — React context
 
-- `WalletProvider` / `useWallet` — connect, chain switch, and a lazy `ensureSmartAccount()`.
-- `StoreProvider` / `useStore` — covenants + audit (persisted), plus the **session-only** signed
+* `WalletProvider` / `useWallet` — connect, chain switch, and a lazy `ensureSmartAccount()`.
+* `StoreProvider` / `useStore` — covenants + audit (persisted), plus the **session-only** signed
   delegations (see [below](#state--persistence)).
 
 ## `components/run-flow.tsx` — the staged run
@@ -132,7 +132,3 @@ npx tsc --noEmit   # typecheck only
 > **Environment notes:** Next.js 16 / React 19 / Tailwind v4 — `params`/`searchParams` are async.
 > tsconfig `target` must stay `ES2020`+ (the code uses BigInt literals like `10n`). `lucide-react` is
 > v1 — verify an icon is exported before importing.
-
----
-
-**Next:** [08 · x402 + ERC-7710 →](./08-x402-and-erc7710.md)

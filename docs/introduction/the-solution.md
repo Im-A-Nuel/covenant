@@ -1,7 +1,7 @@
-# 03 · Solution
+# The Solution
 
 > **Covenant** turns "give the agent a wallet" into "give the agent a *covenant*" — one user-signed
-> spending policy that the agent operates inside, enforced where the agent cannot reach it.
+> spending policy the agent operates inside, enforced where the agent cannot reach it.
 
 ## The covenant
 
@@ -25,8 +25,8 @@ then, the on-chain budget and expiry caveats put a ceiling the agent physically 
 
 ## How it resolves the tension
 
-The problem ([§02](./02-problem.md)) was: *let it spend freely, but never spend wrongly.* Covenant
-splits "wrongly" into two kinds of rule and enforces each where it belongs:
+The problem ([The Problem](the-problem.md)) was: *let it spend freely, but never spend wrongly.* Covenant
+splits "wrongly" into two kinds of rule and enforces each where it belongs.
 
 ```mermaid
 flowchart TB
@@ -42,33 +42,33 @@ flowchart TB
     DU[No duplicates]
     AC[Active window]
   end
-  Hard -->|enforced by| DM[MetaMask DelegationManager · on-chain]
-  Soft -->|enforced by| PE[Policy engine · src/lib/policy.ts]
-  DM --- Pay([A payment can only happen if BOTH layers allow it])
-  PE --- Pay
+  Hard -->|enforced by| DM["MetaMask DelegationManager · on-chain"]
+  Soft -->|enforced by| PEN["Policy engine · src/lib/policy.ts"]
+  DM --- Pay([A payment happens only if BOTH layers allow it])
+  PEN --- Pay
 ```
 
-- **Hard limits live on-chain.** The budget cap and expiry are baked into the signed delegation. The
+* **Hard limits live on-chain.** The budget cap and expiry are baked into the signed delegation. The
   `DelegationManager` rejects any redemption that would exceed the budget or happen after the window —
   *no matter what the agent or even our own server does*. This is the limit the agent cannot raise,
   because it is not enforced by the agent's software at all.
-- **Intent rules live in a firewall.** A pure policy engine evaluates every payment *before* any
+* **Intent rules live in a firewall.** A pure policy engine evaluates every payment *before* any
   redemption is attempted, against the finer covenant rules. If a rule fails, the payment is blocked and
   no transaction is ever built.
 
 Within those two layers, the agent is **fully autonomous**: an ordinary, in-policy payment settles with
-no human in the loop. Only a payment that is over the *soft* per-request cap pauses for a one-time
-"approve once & pay" — and even a malicious agent cannot turn that pause into a drain, because the hard
-on-chain budget still caps the total.
+no human in the loop. Only a payment over the *soft* per-request cap pauses for a one-time "approve once
+& pay" — and even a malicious agent cannot turn that pause into a drain, because the hard on-chain budget
+still caps the total.
 
 ## The value proposition
 
-- **For the user:** sign once, then let the agent work unattended with a guarantee — *worst case, it
+* **For the user:** sign once, then let the agent work unattended with a guarantee — *worst case, it
   spends the budget you set, before the time you set, and nothing more.* Funds never leave your wallet
   except for specific allowed payments. Every decision is auditable.
-- **For the agent:** a clean, autonomous payment capability — discover an x402 service, pay for it, get
+* **For the agent:** a clean, autonomous payment capability — discover an x402 service, pay for it, get
   the data — without ever holding custody of funds or needing per-payment human approval.
-- **For the ecosystem:** a reusable pattern for *safe agentic commerce* that composes existing, audited
+* **For the ecosystem:** a reusable pattern for *safe agentic commerce* that composes existing, audited
   primitives (x402 + ERC-7710 + smart accounts) rather than inventing new trust assumptions.
 
 ## Core guarantees
@@ -78,12 +78,12 @@ on-chain budget still caps the total.
 3. **An in-policy payment needs no human.** (Autonomy.)
 4. **An out-of-policy payment never reaches the chain.** (The firewall stops it before a tx is built.)
 5. **Nothing is hidden.** Real vs simulated is badged at every step; the audit trail records every
-   attempt with its reason and on-chain proof. (See [Real vs simulated](./05-how-it-works.md#real-vs-simulated).)
+   attempt. (See [Real vs Simulated](../core-concepts/real-vs-simulated.md).)
 
 ## A worked example
 
-> Covenant **#001 — Research Agent**: budget 3 USDC, expires in the covenant window, max 0.50/request,
-> allowed services `venice.ai` + `market-api.demo`, purpose `research-data-purchase`.
+> Covenant **#001 — Research Agent**: budget 3 USDC, max 0.50/request, allowed services `venice.ai` +
+> `market-api.demo`, purpose `research-data-purchase`.
 
 The agent is told "analyze ETH short-term risk." It plans, finds free data insufficient, and calls
 `market-api.demo`, which returns `402 Payment Required` for **0.25 USDC**. The policy engine checks:
@@ -94,7 +94,4 @@ on-chain, returns the data, and Venice writes the report. Total human involvemen
 
 Change one thing — a covenant that only allows `inference.xyz`, or a per-request cap of 0.10 — and the
 same payment is **blocked** or **held for approval** instead. Same agent, same task; the covenant decides.
-
----
-
-**Next:** [04 · Architecture →](./04-architecture.md)
+See the three live demo covenants in the [Demo Guide](../getting-started/demo-guide.md).
