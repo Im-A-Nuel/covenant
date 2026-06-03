@@ -35,6 +35,22 @@ function durationHours(label: string): number {
   return DURATIONS.find((d) => d.v === label)?.hours ?? 24;
 }
 
+/** True when an error is the user rejecting the wallet signature (EIP-1193 4001 / viem / MetaMask). */
+function isUserRejection(err: unknown): boolean {
+  let e = err as { code?: unknown; name?: unknown; message?: unknown; cause?: unknown } | undefined | null;
+  for (let i = 0; e && i < 8; i++) {
+    if (e.code === 4001 || e.code === "ACTION_REJECTED") return true;
+    if (typeof e.name === "string" && /UserRejected/i.test(e.name)) return true;
+    if (
+      typeof e.message === "string" &&
+      /user rejected|user denied|rejected the request|denied (?:transaction|message|signature|request)/i.test(e.message)
+    )
+      return true;
+    e = e.cause as typeof e;
+  }
+  return false;
+}
+
 const ArrowRight = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
     <path
@@ -156,8 +172,14 @@ export default function NewCovenantPage() {
             goStep(1);
             return;
           }
-        } catch {
-          /* fall through to simulated */
+        } catch (e) {
+          // The user rejected the MetaMask signature: STOP. Do not silently create
+          // a simulated covenant or advance to the next step.
+          if (isUserRejection(e)) {
+            toast("Signature cancelled — covenant not created");
+            return;
+          }
+          /* genuine signing/wallet error: fall through to the simulated covenant */
         }
       }
 
@@ -511,7 +533,6 @@ export default function NewCovenantPage() {
           <div className="run">
             {currentStep === 2 && (
               <RunFlow
-                key={runResult ? "done" : "active"}
                 covenant={runCovenant}
                 task={task}
                 onDone={(r) => setRunResult(r)}

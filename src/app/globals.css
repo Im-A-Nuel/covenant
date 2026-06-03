@@ -141,7 +141,7 @@ nav.nav{display:flex;flex-direction:column;gap:2px;}
 .mnav{display:none;}
 
 /* ---------- main ---------- */
-.main{padding:38px 48px 64px;max-width:1180px;}
+.main{padding:38px 48px 64px;}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:32px;}
 .page-head .ph-l{min-width:0;}
 .crumb{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--usdc);margin-bottom:11px;}
