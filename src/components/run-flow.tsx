@@ -50,6 +50,8 @@ interface PolicyState {
   statusText: string;
   showDecision: boolean;
   decision: Decision;
+  /** Set once the user approves an over-limit (needs_user) payment. */
+  approved?: boolean;
 }
 interface SettleState {
   status: "amber" | "green";
@@ -100,6 +102,43 @@ const blockIcon = (
   </svg>
 );
 
+const holdIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path d="M9 6v12M15 6v12" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
+  </svg>
+);
+
+/** The policy decision card: icon + copy + tint for each outcome. */
+function DecisionCard({ decision, approved, show }: { decision: Decision; approved: boolean; show: boolean }) {
+  const blocked = decision === "blocked";
+  const pending = decision === "needs_user" && !approved;
+  const cls = blocked ? "blocked" : pending ? "warn" : "";
+  const icon = blocked ? blockIcon : pending ? holdIcon : approveIcon;
+  const title = blocked
+    ? "Blocked by covenant"
+    : decision === "needs_user"
+      ? approved
+        ? "Approved by you"
+        : "Needs your approval"
+      : "Approved";
+  const sub = blocked
+    ? "A covenant rule was violated. Payment blocked; no funds moved."
+    : decision === "needs_user"
+      ? approved
+        ? "One-time approval for a payment over the per-request limit."
+        : "Price is over your per-request limit. Approve this one payment below."
+      : "All checks passed. Payment is within the covenant.";
+  return (
+    <div className={`decision ${cls}`} style={{ display: show ? "flex" : "none" }}>
+      <span className="di">{icon}</span>
+      <div>
+        <b>{title}</b>
+        <div className="dsub">{sub}</div>
+      </div>
+    </div>
+  );
+}
+
 export function RunFlow({
   covenant,
   task,
@@ -120,6 +159,16 @@ export function RunFlow({
   const [x402, setX402] = React.useState<X402State | null>(null);
   const [policy, setPolicy] = React.useState<PolicyState | null>(null);
   const [settle, setSettle] = React.useState<SettleState | null>(null);
+  // The over-limit "approve once" gate: on a needs_user decision the run pauses
+  // until the user resolves this promise via the Approve / Cancel buttons.
+  const [awaitingApproval, setAwaitingApproval] = React.useState(false);
+  const approvalResolver = React.useRef<((approved: boolean) => void) | null>(null);
+  const decideApproval = React.useCallback((approved: boolean) => {
+    const resolve = approvalResolver.current;
+    approvalResolver.current = null;
+    setAwaitingApproval(false);
+    resolve?.(approved);
+  }, []);
 
   // Refs to the appended cards so the staged transform (.rcard -> .rcard.in) can run.
   const planCardRef = React.useRef<HTMLDivElement>(null);
@@ -217,10 +266,10 @@ export function RunFlow({
       setPolicy((p) => (p ? { ...p, status: finalStatus, statusText: finalText, showDecision: true } : p));
       await sleep(560);
 
-      // If the firewall did not approve, halt BEFORE any redemption. The payment is
-      // never made; we record a blocked audit entry and stop. This is the covenant
-      // doing its job on-chain rules + off-chain policy, before a token moves.
-      if (decision !== "approved") {
+      // Hard block: a covenant rule was violated. Halt BEFORE any redemption — the
+      // payment is never made; we record it and stop. The covenant did its job
+      // (on-chain caveats + off-chain policy) before a token moved.
+      if (decision === "blocked") {
         if (!alive) return;
         addAudit({
           id: uid("aud"),
@@ -230,8 +279,8 @@ export function RunFlow({
           service,
           resource,
           amount: price,
-          decision,
-          reason: policyResult?.reason || "Payment held by covenant policy.",
+          decision: "blocked",
+          reason: policyResult?.reason || "Payment blocked by covenant policy.",
           execMode: "simulated",
           remainingBudget: cov.remainingBudget,
           status: "blocked",
@@ -239,8 +288,50 @@ export function RunFlow({
           timeLabel: "just now",
         });
         setStage("done");
-        if (alive) onDone?.({ price, remaining: cov.remainingBudget, service, decision, blocked: true });
+        if (alive) onDone?.({ price, remaining: cov.remainingBudget, service, decision: "blocked", blocked: true });
         return;
+      }
+
+      // Needs approval: the price is over the per-request cap but every other rule
+      // passed. Pause and let the user authorize this single payment. Funds only
+      // move if they approve; a decline is recorded as blocked.
+      let approvedByUser = false;
+      if (decision === "needs_user") {
+        if (!alive) return;
+        setAwaitingApproval(true);
+        approvedByUser = await new Promise<boolean>((resolve) => {
+          approvalResolver.current = resolve;
+        });
+        if (!alive) return;
+        setAwaitingApproval(false);
+
+        if (!approvedByUser) {
+          addAudit({
+            id: uid("aud"),
+            covenantId: cov.id,
+            task,
+            agent: cov.agent,
+            service,
+            resource,
+            amount: price,
+            decision: "blocked",
+            reason: "Over the per-request limit and you declined the one-time approval. No funds moved.",
+            execMode: "simulated",
+            remainingBudget: cov.remainingBudget,
+            status: "blocked",
+            timestamp: new Date().toISOString(),
+            timeLabel: "just now",
+          });
+          setPolicy((p) => (p ? { ...p, status: "red", statusText: "Declined" } : p));
+          setStage("done");
+          if (alive) onDone?.({ price, remaining: cov.remainingBudget, service, decision: "needs_user", blocked: true });
+          return;
+        }
+
+        // Approved by the user — reflect it on the decision card, then settle.
+        setPolicy((p) => (p ? { ...p, status: "green", statusText: "Approved by you", approved: true } : p));
+        await sleep(420);
+        if (!alive) return;
       }
 
       // ---------- 4. SETTLEMENT (only when approved) ----------
@@ -332,7 +423,9 @@ export function RunFlow({
         resource,
         amount: price,
         decision: "approved",
-        reason: policyResult?.reason || "All policy checks passed. Payment within covenant.",
+        reason: approvedByUser
+          ? "Approved by you: a one-time payment over the per-request limit. All other covenant rules passed."
+          : policyResult?.reason || "All policy checks passed. Payment within covenant.",
         transactionHash: proofHash,
         execMode,
         remainingBudget: remaining,
@@ -461,28 +554,27 @@ export function RunFlow({
               );
             })}
           </ul>
-          <div
-            className={`decision ${policy.decision === "blocked" ? "blocked" : policy.decision === "needs_user" ? "warn" : ""}`}
-            style={{ display: policy.showDecision ? "flex" : "none" }}
-          >
-            <span className="di">{policy.decision === "approved" ? approveIcon : blockIcon}</span>
-            <div>
-              <b>
-                {policy.decision === "approved"
-                  ? "Approved"
-                  : policy.decision === "needs_user"
-                    ? "Needs your approval"
-                    : "Blocked by covenant"}
-              </b>
-              <div className="dsub">
-                {policy.decision === "approved"
-                  ? "All checks passed. Payment is within the covenant."
-                  : policy.decision === "needs_user"
-                    ? "Price exceeds your per-request limit. Payment held; no funds moved."
-                    : "A covenant rule was violated. Payment blocked; no funds moved."}
+          <DecisionCard decision={policy.decision} approved={!!policy.approved} show={policy.showDecision} />
+
+          {awaitingApproval && (
+            <div className="approve-gate">
+              <div className="ag-text">
+                <b>Approve this one payment?</b>
+                <span>
+                  {x402 ? `${x402.price.toFixed(2)} USDC` : "This payment"} is over the{" "}
+                  {covenant.maxPerRequest.toFixed(2)} USDC per-request limit. Every other covenant rule passed.
+                </span>
+              </div>
+              <div className="ag-actions">
+                <button className="btn btn-dark" onClick={() => decideApproval(true)}>
+                  Approve once &amp; pay
+                </button>
+                <button className="btn btn-ghost" onClick={() => decideApproval(false)}>
+                  Cancel
+                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

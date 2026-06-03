@@ -17,7 +17,7 @@ interface StoreState {
 }
 
 const Ctx = React.createContext<StoreState | null>(null);
-const KEY = "covenant_state_v1";
+const KEY = "covenant_state_v2";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [covenants, setCovenants] = React.useState<Covenant[]>([]);

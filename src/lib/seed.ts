@@ -18,10 +18,31 @@ export const COVENANTS: Covenant[] = [
     allowedServices: ["venice.ai", "market-api.demo"],
     purpose: "research-data-purchase",
     createdAt: "2026-05-31T06:00:00Z",
-    expiresAt: "2026-06-01T06:00:00Z",
+    expiresAt: "2026-12-31T06:00:00Z",
     status: "active",
     color: "#2775ca",
     payments: 1,
+  },
+  {
+    // Active and clean EXCEPT the per-request cap: the demo payment (0.25 USDC)
+    // is over this covenant's 0.20 limit, but its service, purpose, budget and
+    // window all pass — so a run PAUSES for one-time user approval
+    // ("Approve once & pay") instead of blocking outright.
+    id: "#006",
+    user: "0x7a3F2c",
+    agent: "Insights Agent",
+    token: "USDC",
+    totalBudget: 2.0,
+    remainingBudget: 2.0,
+    durationHours: 24,
+    maxPerRequest: 0.2,
+    allowedServices: ["market-api.demo"],
+    purpose: "research-data-purchase",
+    createdAt: "2026-06-02T18:00:00Z",
+    expiresAt: "2026-12-31T06:30:00Z",
+    status: "active",
+    color: "#0e7490",
+    payments: 0,
   },
   {
     // Active, but intentionally strict: the demo payment (market-api.demo,
@@ -38,7 +59,7 @@ export const COVENANTS: Covenant[] = [
     allowedServices: ["inference.xyz"],
     purpose: "compliance-audit",
     createdAt: "2026-05-31T05:00:00Z",
-    expiresAt: "2026-06-01T05:00:00Z",
+    expiresAt: "2026-12-31T05:00:00Z",
     status: "active",
     color: "#7c5cff",
     payments: 3,
