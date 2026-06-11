@@ -118,7 +118,7 @@ export function SettlementReadiness({ covenant }: { covenant: Covenant }) {
         </div>
         <div className="ready-row">
           <span className="rk">Signed this session</span>
-          <span className="rv">{hasSigned ? "yes" : "no — re-create to redeem"}</span>
+          <span className="rv">{hasSigned ? "yes" : "no, re-create to redeem"}</span>
         </div>
       </div>
 

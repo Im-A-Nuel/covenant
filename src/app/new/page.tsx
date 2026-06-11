@@ -176,7 +176,7 @@ export default function NewCovenantPage() {
           // The user rejected the MetaMask signature: STOP. Do not silently create
           // a simulated covenant or advance to the next step.
           if (isUserRejection(e)) {
-            toast("Signature cancelled — covenant not created");
+            toast("Signature cancelled. Covenant not created.", "info");
             return;
           }
           /* genuine signing/wallet error: fall through to the simulated covenant */
