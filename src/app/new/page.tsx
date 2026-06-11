@@ -31,6 +31,23 @@ const DURATIONS: { v: string; hours: number }[] = [
 
 const fmt = (n: number) => Number(n).toFixed(2) + " USDC";
 
+/** AI reports come back as markdown. Flatten to clean, readable plain text so the
+ *  verdict block doesn't show raw `##`, `**` and table pipes. */
+function cleanReport(md: string): string {
+  return md
+    .replace(/```[\s\S]*?```/g, "") // drop code fences
+    .replace(/^\s*\|?[\s:|-]+\|?\s*$/gm, "") // table separator rows (---|---)
+    .replace(/^\s*\|(.+)\|\s*$/gm, (_m, row) =>
+      String(row).split("|").map((c: string) => c.trim()).filter(Boolean).join(" · ")
+    ) // table rows -> " a · b · c "
+    .replace(/^#{1,6}\s*/gm, "") // headings
+    .replace(/\*\*(.*?)\*\*/g, "$1") // bold
+    .replace(/(^|\s)\*(\S.*?)\*/g, "$1$2") // italics
+    .replace(/^\s*[-*]\s+/gm, "• ") // bullets
+    .replace(/\n{3,}/g, "\n\n") // collapse blank runs
+    .trim();
+}
+
 function durationHours(label: string): number {
   return DURATIONS.find((d) => d.v === label)?.hours ?? 24;
 }
@@ -229,6 +246,11 @@ export default function NewCovenantPage() {
   const runPrice = runResult?.price ?? 0.25;
   const runService = runResult?.service ?? "market-api.demo";
   const runTx = runResult?.txHash ?? "0x8f3c…a31c";
+  // A run can end blocked (hard rule) or declined (over-limit, you said no). Step 4
+  // must reflect that honestly instead of always showing the happy-path summary.
+  const runBlocked = !!runResult?.blocked;
+  const runDeclined = runResult?.decision === "needs_user" && runBlocked;
+  const taskShort = task.length > 80 ? task.slice(0, 80) + "…" : task;
 
   const [showPreview, setShowPreview] = React.useState(false);
   const { toast } = useToast();
@@ -569,47 +591,65 @@ export default function NewCovenantPage() {
               <div className="report">
                 <div className="rep-h">
                   <span
-                    className="ri green"
+                    className={`ri ${runBlocked ? "red" : "green"}`}
                     style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M5 12.5l4.2 4.2L19 7"
-                        stroke="#2f8f5b"
-                        strokeWidth="2.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    {runBlocked ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M7 7l10 10M17 7L7 17" stroke="#cf4b3e" strokeWidth="2.4" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M5 12.5l4.2 4.2L19 7"
+                          stroke="#2f8f5b"
+                          strokeWidth="2.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
                   </span>
-                  <h3>Task complete</h3>
-                  <span className="pill active" style={{ marginLeft: "auto" }}>
-                    Completed
+                  <h3>{runBlocked ? "Payment blocked" : "Task complete"}</h3>
+                  <span className={`pill ${runBlocked ? "blocked" : "active"}`} style={{ marginLeft: "auto" }}>
+                    {runBlocked ? "Blocked" : "Completed"}
                   </span>
                 </div>
-                <p className="verdict display">
-                  {runResult?.report ? (
-                    runResult.report
-                  ) : (
-                    <>
-                      ETH shows <b>elevated short-term risk</b>. Paid sentiment data confirmed
-                      rising downside pressure over the next 24–48h.
-                    </>
-                  )}
-                </p>
+                {runBlocked ? (
+                  <p className="verdict display">
+                    {runDeclined ? (
+                      <>
+                        You <b>declined</b> a payment over the per-request limit. No funds moved; the
+                        covenant held.
+                      </>
+                    ) : (
+                      <>
+                        A covenant rule was <b>violated</b>, so Covenant blocked the payment before any
+                        token moved. The agent could not spend.
+                      </>
+                    )}
+                  </p>
+                ) : runResult?.report ? (
+                  <div className="verdict-report">{cleanReport(runResult.report)}</div>
+                ) : (
+                  <p className="verdict display">
+                    ETH shows <b>elevated short-term risk</b>. Paid sentiment data confirmed rising
+                    downside pressure over the next 24–48h.
+                  </p>
+                )}
                 <div className="kv">
                   <span className="k">Task</span>
-                  <span className="v">ETH short-term risk analysis</span>
+                  <span className="v">{taskShort}</span>
                   <span className="k">Data source</span>
-                  <span className="v">Paid sentiment report</span>
+                  <span className="v">{runBlocked ? "none (payment blocked)" : "Paid sentiment report"}</span>
                   <span className="k">Payment</span>
-                  <span className="v">{fmt(runPrice)}</span>
+                  <span className="v">{runBlocked ? "0.00 USDC (no funds moved)" : fmt(runPrice)}</span>
                   <span className="k">Permission used</span>
                   <span className="v">Covenant {runCovenant.id}</span>
                   <span className="k">Service</span>
                   <span className="v">{runService}</span>
                   <span className="k">Tx hash</span>
-                  <span className="v mono">{runTx}</span>
+                  <span className="v mono">{runBlocked ? "none" : runTx}</span>
                   <span className="k">Remaining budget</span>
                   <span className="v">{fmt(remaining)}</span>
                 </div>
@@ -636,11 +676,11 @@ export default function NewCovenantPage() {
               <ul className="tl">
                 <li>
                   <b>Task received</b>
-                  <small>“Analyze ETH short-term risk”</small>
+                  <small>“{taskShort}”</small>
                 </li>
                 <li>
                   <b>Plan generated</b>
-                  <small>Venice AI · 4 steps</small>
+                  <small>AI planner · multi-step</small>
                 </li>
                 <li>
                   <b>Free data checked</b>
@@ -650,18 +690,41 @@ export default function NewCovenantPage() {
                   <b>402 Payment Required</b>
                   <small>{runService} · {fmt(runPrice)}</small>
                 </li>
-                <li>
-                  <b>Policy approved</b>
-                  <small>All 6 checks passed</small>
-                </li>
-                <li>
-                  <b>Payment settled</b>
-                  <small>ERC-7710 · redeemed via DelegationManager</small>
-                </li>
-                <li>
-                  <b>Report delivered</b>
-                  <small>Remaining budget {fmt(remaining)}</small>
-                </li>
+                {runBlocked ? (
+                  <>
+                    <li>
+                      <b>{runDeclined ? "Approval declined" : "Policy blocked"}</b>
+                      <small>
+                        {runDeclined
+                          ? "Over per-request limit · you declined"
+                          : "Covenant rule violated · payment stopped"}
+                      </small>
+                    </li>
+                    <li>
+                      <b>No funds moved</b>
+                      <small>Budget intact · {fmt(remaining)}</small>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <b>Policy approved</b>
+                      <small>
+                        {runResult?.approvedOnce
+                          ? "Over-limit · you approved once"
+                          : "All checks passed"}
+                      </small>
+                    </li>
+                    <li>
+                      <b>Payment settled</b>
+                      <small>ERC-7710 · redeemed via DelegationManager</small>
+                    </li>
+                    <li>
+                      <b>Report delivered</b>
+                      <small>Remaining budget {fmt(remaining)}</small>
+                    </li>
+                  </>
+                )}
               </ul>
             </aside>
           </div>
