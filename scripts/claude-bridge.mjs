@@ -39,12 +39,37 @@
  */
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { homedir } from "node:os";
 
 const PORT = Number(process.env.BRIDGE_PORT || 8787);
 const HOST = process.env.BRIDGE_HOST || "127.0.0.1";
 const CLAUDE_BIN = process.env.CLAUDE_BIN || "claude";
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "";
 const NO_TOOLS = "Bash Edit Write Read Glob Grep WebFetch WebSearch NotebookEdit Task".split(" ");
+
+/**
+ * Resolve the Claude executable. On Windows, Node's spawn (no shell) does NOT
+ * append .exe, so a bare "claude" fails with ENOENT even when it's on PATH.
+ * Probe the common install locations so `node claude-bridge.mjs` just works
+ * without anyone having to set CLAUDE_BIN. On macOS/Linux a bare name is fine
+ * (PATH lookup), so we fall through to it.
+ */
+function resolveClaude(bin) {
+  if (existsSync(bin)) return bin; // explicit/absolute path that exists
+  if (process.platform === "win32") {
+    const candidates = [
+      bin.toLowerCase().endsWith(".exe") ? bin : `${bin}.exe`,
+      join(homedir(), ".local", "bin", "claude.exe"),
+      join(process.env.LOCALAPPDATA || "", "Programs", "claude", "claude.exe"),
+      join(process.env.APPDATA || "", "npm", "claude.cmd"),
+    ];
+    for (const c of candidates) if (c && existsSync(c)) return c;
+  }
+  return bin; // PATH lookup (works on macOS/Linux)
+}
+const CLAUDE = resolveClaude(CLAUDE_BIN);
 
 /** Split OpenAI messages into a system prompt (override) and a user prompt. */
 function splitMessages(messages, wantJson) {
@@ -74,12 +99,12 @@ function runClaude(system, prompt) {
     if (CLAUDE_MODEL) args.push("--model", CLAUDE_MODEL);
     args.push("--disallowed-tools", ...NO_TOOLS);
 
-    const child = spawn(CLAUDE_BIN, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(CLAUDE, args, { stdio: ["ignore", "pipe", "pipe"] });
     let out = "";
     let err = "";
     child.stdout.on("data", (d) => (out += d));
     child.stderr.on("data", (d) => (err += d));
-    child.on("error", (e) => reject(new Error(`spawn ${CLAUDE_BIN} failed: ${e.message}`)));
+    child.on("error", (e) => reject(new Error(`spawn ${CLAUDE} failed: ${e.message}`)));
     child.on("close", (code) => {
       if (code !== 0) {
         return reject(new Error(`claude exited ${code}: ${err.slice(0, 200) || out.slice(0, 200)}`));
@@ -143,6 +168,6 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`[claude-bridge] listening on http://${HOST}:${PORT}  (bin: ${CLAUDE_BIN}${CLAUDE_MODEL ? `, model: ${CLAUDE_MODEL}` : ""})`);
+  console.log(`[claude-bridge] listening on http://${HOST}:${PORT}  (bin: ${CLAUDE}${CLAUDE_MODEL ? `, model: ${CLAUDE_MODEL}` : ""})`);
   console.log(`[claude-bridge] set VENICE_BASE_URL=http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT} and VENICE_API_KEY=local`);
 });
