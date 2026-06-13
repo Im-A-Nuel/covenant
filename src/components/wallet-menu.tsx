@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { useWallet } from "@/lib/wallet";
 import { shortAddr } from "@/lib/utils";
 
@@ -137,7 +138,7 @@ export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) 
         </div>
       )}
 
-      {picking && (
+      {picking && typeof document !== "undefined" && createPortal(
         <div className="wpick-backdrop" onClick={() => setPicking(false)}>
           <div className="wpick" role="dialog" aria-label="Choose a wallet" onClick={(e) => e.stopPropagation()}>
             <div className="wpick-head">
@@ -172,7 +173,8 @@ export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) 
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
