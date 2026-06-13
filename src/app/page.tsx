@@ -111,6 +111,18 @@ const FAQ_ITEMS: [string, string][] = [
   ["Do I need real funds to try it?", "No. Covenant runs on Base Sepolia testnet. Without a connected wallet it runs in a simulated mode; with one it signs a real ERC-7710 delegation, and on-chain settlement just needs testnet USDC and a little gas."],
 ];
 
+/* ---- proof avatars: real agent icons (research, bot, trading), not letters ---- */
+const AV = ({ children }: { children: React.ReactNode }) => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    {children}
+  </svg>
+);
+const AVATARS: { bg: string; icon: React.ReactNode }[] = [
+  { bg: "linear-gradient(135deg,#2775ca,#4f97e0)", icon: <AV><circle cx="11" cy="11" r="5.4" /><path d="M19 19l-3.4-3.4" /></AV> },
+  { bg: "linear-gradient(135deg,#f3b9c8,#f6c9b6)", icon: <AV><rect x="5.5" y="8.5" width="13" height="9.5" rx="3" /><path d="M12 8.5V5.7" /><circle cx="12" cy="4.6" r=".5" fill="#fff" stroke="none" /><path d="M9.8 13h.01M14.2 13h.01" /></AV> },
+  { bg: "linear-gradient(135deg,#bcd0ad,#8fb37c)", icon: <AV><path d="M5 15l4-4 3 3 6-7" /><path d="M16 7h4v4" /></AV> },
+];
+
 const NAV_SECTIONS = ["why", "who", "features", "reserve"] as const;
 
 /**
@@ -269,9 +281,9 @@ export default function Landing() {
             </div>
             <div className="proof">
               <div className="avatars">
-                <span style={{ background: "linear-gradient(135deg,#2775ca,#4f97e0)" }}>R</span>
-                <span style={{ background: "linear-gradient(135deg,#f3b9c8,#f6c9b6)" }}>A</span>
-                <span style={{ background: "linear-gradient(135deg,#bcd0ad,#8fb37c)" }}>T</span>
+                {AVATARS.map((a, i) => (
+                  <span key={i} style={{ background: a.bg }}>{a.icon}</span>
+                ))}
               </div>
               <span><b>Policy-bound</b> x402 payments, built on MetaMask Smart Accounts</span>
             </div>
@@ -564,8 +576,9 @@ export default function Landing() {
           </div>
           <div className="proof">
             <div className="avatars">
-              <span style={{ background: "linear-gradient(135deg,#2775ca,#4f97e0)" }}>R</span>
-              <span style={{ background: "linear-gradient(135deg,#f3b9c8,#f6c9b6)" }}>A</span>
+              {AVATARS.slice(0, 2).map((a, i) => (
+                <span key={i} style={{ background: a.bg }}>{a.icon}</span>
+              ))}
             </div>
             <span>The safety layer for self-paying AI agents</span>
           </div>
