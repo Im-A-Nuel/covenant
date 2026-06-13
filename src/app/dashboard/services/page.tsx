@@ -33,9 +33,9 @@ export default function ServicesPage() {
           </svg>
         </span>
         <p>
-          <b>Verification is the first firewall.</b> An agent can only pay a service that&apos;s
-          verified <em>and</em> listed in its covenant. Unverified services are shown here for
-          transparency but can never be charged.
+          <b>Verification is the first firewall.</b>{" "}
+          An agent can only pay a service that&apos;s verified <em>and</em> listed in its covenant.
+          Unverified services are shown here for transparency but can never be charged.
         </p>
       </div>
 

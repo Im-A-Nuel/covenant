@@ -161,7 +161,7 @@ export default function Dashboard() {
   const blockedWeek = CHART_DATA.filter((d) => d[2]).length;
   const peak = Math.max(...CHART_DATA.map((d) => d[1]));
 
-  const feed = audit.slice(0, 6);
+  const feed = audit.slice(0, 4);
 
   return (
     <>
@@ -363,7 +363,7 @@ export default function Dashboard() {
             <Link href="/dashboard/covenants">Manage all →</Link>
           </div>
           <div className="cov-mini-grid">
-            {active.map((c) => (
+            {active.slice(0, 2).map((c) => (
               <CovenantCard
                 key={c.id}
                 covenant={c}

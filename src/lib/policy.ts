@@ -16,14 +16,18 @@ export function evaluatePolicy(
   checks.push({
     label: "Budget remaining",
     ok: budgetOk,
-    detail: `${payment.price} ≤ ${covenant.remainingBudget.toFixed(2)} USDC remaining`,
+    detail: budgetOk
+      ? `${payment.price} ≤ ${covenant.remainingBudget.toFixed(2)} USDC remaining`
+      : `${payment.price} > ${covenant.remainingBudget.toFixed(2)} USDC remaining (insufficient)`,
   });
 
   const perReqOk = payment.price <= covenant.maxPerRequest;
   checks.push({
     label: "Under max per request",
     ok: perReqOk,
-    detail: `${payment.price} ≤ ${covenant.maxPerRequest} USDC limit`,
+    detail: perReqOk
+      ? `${payment.price} ≤ ${covenant.maxPerRequest} USDC limit`
+      : `${payment.price} > ${covenant.maxPerRequest} USDC limit (over)`,
   });
 
   const serviceOk =
