@@ -164,21 +164,38 @@ export default function Landing() {
   const [openFaq, setOpenFaq] = React.useState(0);
   const [activeNav, setActiveNav] = React.useState<string>("why");
 
-  // nav active state on scroll
+  // nav active state — scrollspy by position so the highlight matches the
+  // section actually shown (the old intersection band mis-fired on the short
+  // #who heading and highlighted Features instead).
   React.useEffect(() => {
-    const secs = NAV_SECTIONS
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
-    const io = new IntersectionObserver(
-      (es) => {
-        es.forEach((e) => {
-          if (e.isIntersecting) setActiveNav((e.target as HTMLElement).id);
-        });
-      },
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    secs.forEach((s) => io.observe(s));
-    return () => io.disconnect();
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const probe = window.scrollY + 120; // just below the 92px sticky-nav padding
+      let current: string = NAV_SECTIONS[0];
+      for (const id of NAV_SECTIONS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        if (top - 1 <= probe) current = id;
+      }
+      // at the very bottom, force the last section active (its top never reaches probe)
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        current = NAV_SECTIONS[NAV_SECTIONS.length - 1];
+      }
+      setActiveNav(current);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Reveal elements as they scroll into view, and hide them again when they
