@@ -20,7 +20,8 @@
 }
 *{box-sizing:border-box;}
 html,body{height:100%;}
-html{scroll-behavior:smooth;scroll-padding-top:92px;}
+html{scroll-behavior:smooth;scroll-padding-top:92px;overflow-x:clip;}
+body{overflow-x:clip;}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:var(--font-hanken),system-ui,sans-serif;font-size:15px;line-height:1.55;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
@@ -78,6 +79,20 @@ nav.nav{display:flex;flex-direction:column;gap:2px;}
 .wallet-pop-btn.danger:hover{background:rgba(207,75,62,.06);border-color:var(--block);}
 .wallet-pop-btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
 .wallet-pop-btn.primary:hover{background:#000;}
+
+/* wallet chooser modal (EIP-6963 picker) */
+.wpick-backdrop{position:fixed;inset:0;z-index:200;background:rgba(12,12,13,.45);display:flex;align-items:center;justify-content:center;padding:20px;}
+.wpick{width:340px;max-width:100%;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 30px 70px -30px rgba(0,0,0,.5);}
+.wpick-head{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 13px;}
+.wpick-head b{font-size:15.5px;}
+.wpick-x{border:none;background:var(--chip);color:var(--ink-2);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.wpick-x:hover{color:var(--ink);}
+.wpick-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s;margin-bottom:8px;}
+.wpick-item:hover{border-color:#d8d6cf;background:var(--line-2);}
+.wpick-ic{width:28px;height:28px;border-radius:8px;background-size:contain;background-position:center;background-repeat:no-repeat;flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
+.wpick-ic.generic{background:rgba(39,117,202,.1);color:var(--usdc);}
+.wpick-install{display:block;text-align:center;font-size:13px;color:var(--usdc);margin-top:2px;text-decoration:none;}
+.wpick-install:hover{text-decoration:underline;}
 /* place above the trigger when the wallet sits at the bottom of a desktop sidebar */
 .dash-side .wallet-pop,.app.wizard .side .wallet-pop{top:auto;bottom:calc(100% + 8px);}
 @keyframes popin{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
@@ -1057,7 +1072,8 @@ body.intro-lock{overflow:hidden;}
 }
 @media(max-width:560px){
   .landing .wrap{padding:0 18px;}
-  .landing .nav-inner{height:62px;gap:14px;}
+  .landing .nav-inner{height:62px;gap:12px;}
+  .landing .nav-app{display:none;} /* declutter phone nav; dashboard reachable via footer + hero */
   .landing .hero{padding:40px 0 56px;}
   .landing h1.hero-h{font-size:33px;}
   .landing .hero-sub{font-size:15.5px;}

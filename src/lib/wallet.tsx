@@ -1,9 +1,21 @@
 "use client";
 
 import * as React from "react";
-import type { Address } from "viem";
-import { getInjected, CHAIN } from "./chain";
+import type { Address, EIP1193Provider } from "viem";
+import { getInjected, setInjectedProvider, CHAIN } from "./chain";
 import { createUserSmartAccount, type SmartAccount } from "./smart-account";
+
+/** A wallet announced via EIP-6963 (multi-wallet discovery). */
+export interface WalletInfo {
+  uuid: string;
+  name: string;
+  icon: string;
+  rdns: string;
+}
+export interface Eip6963Detail {
+  info: WalletInfo;
+  provider: EIP1193Provider;
+}
 
 interface WalletState {
   account?: Address;
@@ -14,7 +26,8 @@ interface WalletState {
   error?: string;
   hasWallet: boolean;
   correctChain: boolean;
-  connect: () => Promise<void>;
+  wallets: Eip6963Detail[];
+  connect: (provider?: EIP1193Provider) => Promise<void>;
   ensureSmartAccount: () => Promise<SmartAccount | undefined>;
   switchChain: () => Promise<void>;
   disconnect: () => void;
@@ -32,6 +45,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [creatingSA, setCreatingSA] = React.useState(false);
   const [error, setError] = React.useState<string>();
   const [hasWallet, setHasWallet] = React.useState(false);
+  const [wallets, setWallets] = React.useState<Eip6963Detail[]>([]);
+
+  // EIP-6963: discover every injected wallet so the user can pick one.
+  React.useEffect(() => {
+    const onAnnounce = (e: Event) => {
+      const d = (e as CustomEvent<Eip6963Detail>).detail;
+      if (!d?.info?.uuid) return;
+      setWallets((prev) => (prev.some((w) => w.info.uuid === d.info.uuid) ? prev : [...prev, d]));
+    };
+    window.addEventListener("eip6963:announceProvider", onAnnounce as EventListener);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    return () => window.removeEventListener("eip6963:announceProvider", onAnnounce as EventListener);
+  }, []);
 
   React.useEffect(() => {
     const p = getInjected();
@@ -83,12 +109,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const connect = React.useCallback(async () => {
-    const p = getInjected();
+  const connect = React.useCallback(async (provider?: EIP1193Provider) => {
+    const p = provider ?? getInjected();
     if (!p) {
-      setError("MetaMask not found. Install it to continue.");
+      setError("No wallet found. Install MetaMask to continue.");
       return;
     }
+    setInjectedProvider(p); // route all later requests to the picked wallet
     setConnecting(true);
     setError(undefined);
     try {
@@ -128,6 +155,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnect = React.useCallback(() => {
     setAccount(undefined);
     setSmartAccount(undefined);
+    setInjectedProvider(undefined);
   }, []);
 
   const value: WalletState = {
@@ -139,6 +167,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     error,
     hasWallet,
     correctChain: chainId === CHAIN.id,
+    wallets,
     connect,
     ensureSmartAccount,
     switchChain,

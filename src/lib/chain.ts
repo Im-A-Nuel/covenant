@@ -20,7 +20,15 @@ export const publicClient = createPublicClient({
   transport: http(RPC_URL),
 }) as unknown as PublicClient;
 
+// The provider the user explicitly picked in the wallet chooser (EIP-6963).
+// When set, it overrides auto-detection so every request goes to that wallet.
+let chosenProvider: EIP1193Provider | undefined;
+export function setInjectedProvider(p: EIP1193Provider | undefined) {
+  chosenProvider = p;
+}
+
 export function getInjected(): EIP1193Provider | undefined {
+  if (chosenProvider) return chosenProvider;
   if (typeof window === "undefined") return undefined;
   // Prefer MetaMask if multiple providers are injected.
   const eth = (window as unknown as { ethereum?: EIP1193Provider & { providers?: EIP1193Provider[]; isMetaMask?: boolean } }).ethereum;

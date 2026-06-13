@@ -12,10 +12,25 @@ const DEMO_ADDR = "0x7a…3F2c";
  * mobile top bar, and the wizard sidebar (chip), so it works on every page.
  */
 export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) {
-  const { account, connect, disconnect, connecting } = useWallet();
+  const { account, connect, disconnect, connecting, wallets } = useWallet();
   const [open, setOpen] = React.useState(false);
+  const [picking, setPicking] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
+
+  // Open the wallet chooser instead of connecting straight to the default wallet.
+  const startConnect = React.useCallback(() => {
+    setOpen(false);
+    setPicking(true);
+  }, []);
+
+  const pick = React.useCallback(
+    (detail?: { provider: Parameters<typeof connect>[0] }) => {
+      setPicking(false);
+      void connect(detail?.provider);
+    },
+    [connect]
+  );
 
   const connected = !!account;
   const shown = connected ? shortAddr(account) : DEMO_ADDR;
@@ -46,10 +61,10 @@ export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) 
     }
   }
 
-  // landing pill, not connected → a plain "Connect Wallet" call to action
-  if (variant === "pill" && !connected) {
-    return (
-      <button type="button" className="btn btn-dark wallet-btn" onClick={() => connect()}>
+  const trigger =
+    variant === "pill" && !connected ? (
+      // landing pill, not connected → opens the wallet chooser
+      <button type="button" className="btn btn-dark wallet-btn" onClick={startConnect}>
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
           <path d="M3 7.5A2.5 2.5 0 015.5 5H18a1 1 0 011 1v1.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" />
           <rect x="3" y="7" width="18" height="12" rx="2.5" stroke="#fff" strokeWidth="1.7" />
@@ -57,11 +72,7 @@ export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) 
         </svg>
         <span>{connecting ? "Connecting…" : "Connect Wallet"}</span>
       </button>
-    );
-  }
-
-  const trigger =
-    variant === "pill" ? (
+    ) : variant === "pill" ? (
       <button
         type="button"
         className="btn btn-dark wallet-btn connected"
@@ -118,16 +129,47 @@ export function WalletMenu({ variant = "chip" }: { variant?: "chip" | "pill" }) 
                 Disconnect
               </button>
             ) : (
-              <button
-                type="button"
-                className="wallet-pop-btn primary"
-                onClick={() => {
-                  connect();
-                  setOpen(false);
-                }}
-              >
-                Connect MetaMask
+              <button type="button" className="wallet-pop-btn primary" onClick={startConnect}>
+                Connect wallet
               </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {picking && (
+        <div className="wpick-backdrop" onClick={() => setPicking(false)}>
+          <div className="wpick" role="dialog" aria-label="Choose a wallet" onClick={(e) => e.stopPropagation()}>
+            <div className="wpick-head">
+              <b>Choose a wallet</b>
+              <button type="button" className="wpick-x" aria-label="Close" onClick={() => setPicking(false)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            {wallets.length > 0 ? (
+              wallets.map((w) => (
+                <button key={w.info.uuid} type="button" className="wpick-item" onClick={() => pick(w)}>
+                  <span className="wpick-ic" style={{ backgroundImage: `url(${w.info.icon})` }} />
+                  <span>{w.info.name}</span>
+                </button>
+              ))
+            ) : (
+              <>
+                <button type="button" className="wpick-item" onClick={() => pick()}>
+                  <span className="wpick-ic generic">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="7" width="18" height="12" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
+                      <circle cx="16.5" cy="13" r="1.5" fill="currentColor" />
+                    </svg>
+                  </span>
+                  <span>Browser wallet</span>
+                </button>
+                <a className="wpick-install" href="https://metamask.io/download/" target="_blank" rel="noreferrer">
+                  No wallet? Install MetaMask →
+                </a>
+              </>
             )}
           </div>
         </div>
