@@ -230,6 +230,7 @@ export default function Landing() {
             <a href="#who" className={activeNav === "who" ? "active" : undefined}>Who it&apos;s for</a>
             <a href="#features" className={activeNav === "features" ? "active" : undefined}>Features</a>
             <a href="#reserve" className={activeNav === "reserve" ? "active" : undefined}>FAQ</a>
+            <a href="https://covenant-3.gitbook.io/covenant-docs" target="_blank" rel="noreferrer">Docs</a>
           </nav>
           <WalletMenu variant="pill" />
         </div>
@@ -573,13 +574,15 @@ export default function Landing() {
               <h4>Product</h4>
               <Link href="/dashboard">Open the app</Link>
               <Link href="/new">Create a covenant</Link>
+              <a href="https://covenant-3.gitbook.io/covenant-docs" target="_blank" rel="noreferrer">Documentation</a>
+              <a href="https://github.com/Im-A-Nuel/covenant" target="_blank" rel="noreferrer">GitHub</a>
             </div>
           </div>
           <div className="foot-bottom reveal">
             <span>© 2026 Covenant. Let agents pay, but only under covenant.</span>
             <div className="foot-social">
-              <a href="#" aria-label="X"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M18 3h3l-7 8 8 10h-6l-5-6-5 6H3l8-9L3 3h6l4 5 5-5z" /></svg></a>
-              <a href="#" aria-label="GitHub"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 00-3 19.5c.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6 0-.6 0-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1 2.9.8.1-.6.3-1 .6-1.3-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7 0-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 015 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.8-4.6 5 .3.3.6.9.6 1.8v2.7c0 .3.2.6.7.5A10 10 0 0012 2z" /></svg></a>
+              <a href="https://github.com/Im-A-Nuel/covenant" target="_blank" rel="noreferrer" aria-label="GitHub"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 00-3 19.5c.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6 0-.6 0-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1 2.9.8.1-.6.3-1 .6-1.3-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7 0-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 015 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.8-4.6 5 .3.3.6.9.6 1.8v2.7c0 .3.2.6.7.5A10 10 0 0012 2z" /></svg></a>
+              <a href="https://covenant-3.gitbook.io/covenant-docs" target="_blank" rel="noreferrer" aria-label="Documentation"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round"><path d="M5 4.5A1.5 1.5 0 016.5 3H18v15H6.5A1.5 1.5 0 005 19.5V4.5z" /><path d="M5 19.5A1.5 1.5 0 016.5 18H18v3H6.5A1.5 1.5 0 015 19.5z" /></svg></a>
             </div>
           </div>
         </div>
