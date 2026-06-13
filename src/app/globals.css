@@ -715,6 +715,7 @@ h1.ph{font-size:38px;margin:0 0 8px;}
 .landing .brand{display:flex;align-items:center;gap:11px;font-size:19px;font-weight:600;letter-spacing:-.01em;padding:0;}
 .landing .mark{flex:0 0 auto;}
 .landing .nav-div{width:1px;height:26px;background:var(--line);}
+.landing .nav-app{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;font-size:14px;flex:0 0 auto;}
 .landing nav.links{display:flex;gap:30px;flex:1;}
 .landing nav.links a{color:var(--muted);font-size:15px;font-weight:500;position:relative;padding:4px 0;transition:color .18s;}
 .landing nav.links a:hover{color:var(--ink);}

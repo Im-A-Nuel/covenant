@@ -261,6 +261,10 @@ export default function Landing() {
             <a href="#reserve" className={activeNav === "reserve" ? "active" : undefined}>FAQ</a>
             <a href="https://covenant-3.gitbook.io/covenant-docs" target="_blank" rel="noreferrer">Docs</a>
           </nav>
+          <Link className="btn btn-ghost nav-app" href="/dashboard">
+            Open app
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </Link>
           <WalletMenu variant="pill" />
         </div>
       </header>
