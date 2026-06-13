@@ -20,7 +20,7 @@
 }
 *{box-sizing:border-box;}
 html,body{height:100%;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth;scroll-padding-top:92px;}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:var(--font-hanken),system-ui,sans-serif;font-size:15px;line-height:1.55;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
@@ -878,6 +878,8 @@ h1.ph{font-size:38px;margin:0 0 8px;}
   will-change:opacity,transform,filter;
 }
 .landing .reveal.in{opacity:1;transform:none;filter:blur(0);}
+/* fade-only variant: no transform/blur, so it stays a stable scroll-anchor (e.g. #who) */
+.landing .reveal.reveal-fade,.landing .reveal.reveal-fade.in{transform:none;filter:none;}
 @media (prefers-reduced-motion:reduce){
   .landing .reveal{opacity:1!important;transform:none!important;filter:none!important;transition:none!important;}
 }

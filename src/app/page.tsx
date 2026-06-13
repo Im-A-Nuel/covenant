@@ -349,7 +349,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <h3 className="display cats-title reveal" id="who">F<i>o</i>r every kind <i>o</i>f <i>a</i>gent</h3>
+          <h3 className="display cats-title reveal reveal-fade" id="who">F<i>o</i>r every kind <i>o</i>f <i>a</i>gent</h3>
         </div>
 
         <div className="marquee reveal">
