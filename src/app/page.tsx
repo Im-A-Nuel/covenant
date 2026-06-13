@@ -7,17 +7,41 @@ import { WalletMenu } from "@/components/wallet-menu";
 import { IconBot, IconCoin, IconClock, IconLimit } from "@/components/icons";
 
 /* ---- agent categories marquee ---- */
-const cats: [string, string][] = [
-  ["Research agents", "#dbe7f6"], ["Trading bots", "#e8e0f6"], ["Data pipelines", "#e2efe5"],
-  ["DAO operations", "#fbe7dd"], ["Inference apps", "#f6e2ea"], ["Dev tooling", "#e7eaee"],
-  ["API marketplaces", "#e3f0ef"], ["Content agents", "#efeada"], ["Onchain analysts", "#dfe9f4"],
-  ["Autonomous shoppers", "#f5e3da"], ["Voice assistants", "#e6e2f3"], ["Monitoring agents", "#e1efe2"],
+const CI = ({ children }: { children: React.ReactNode }) => (
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    {children}
+  </svg>
+);
+
+// One distinct, on-theme line icon per agent category (no blank gradient squares).
+const CAT_ICONS: Record<string, React.ReactNode> = {
+  "Research agents": <CI><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-3.8-3.8" /></CI>,
+  "Trading bots": <CI><path d="M4 14l4-4 3 3 6-7" /><path d="M15 6h4v4" /></CI>,
+  "Data pipelines": <CI><circle cx="5" cy="7" r="1.6" /><circle cx="19" cy="16" r="1.6" /><path d="M6.6 7H14a4 4 0 014 4v3.6" /></CI>,
+  "DAO operations": <CI><circle cx="9" cy="9" r="3" /><path d="M3.6 19c.3-3 2.7-4.6 5.4-4.6S14.1 16 14.4 19" /><path d="M16 7.2a3 3 0 010 5.6" /></CI>,
+  "Inference apps": <CI><rect x="7" y="7" width="10" height="10" rx="2" /><path d="M10 4v3M14 4v3M10 17v3M14 17v3M4 10h3M4 14h3M17 10h3M17 14h3" /></CI>,
+  "Dev tooling": <CI><path d="M9 8l-4 4 4 4M15 8l4 4-4 4" /></CI>,
+  "API marketplaces": <CI><rect x="4" y="4" width="7" height="7" rx="1.6" /><rect x="13" y="4" width="7" height="7" rx="1.6" /><rect x="4" y="13" width="7" height="7" rx="1.6" /><rect x="13" y="13" width="7" height="7" rx="1.6" /></CI>,
+  "Content agents": <CI><path d="M14 4l6 6M4.5 19.5l.9-3.6L16 5.3l2.7 2.7L8.1 18.6z" /></CI>,
+  "Onchain analysts": <CI><path d="M5 19V11M10 19V6M15 19v-8M20 19V8" /></CI>,
+  "Autonomous shoppers": <CI><circle cx="9.5" cy="20" r="1.3" /><circle cx="18" cy="20" r="1.3" /><path d="M3 4h2.2l2.4 11h10l1.8-7.5H7" /></CI>,
+  "Voice assistants": <CI><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" /></CI>,
+  "Monitoring agents": <CI><path d="M3 12h4l2.2-6 3.6 12 2.2-6H21" /></CI>,
+};
+
+const cats: [string, string, string][] = [
+  ["Research agents", "#dbe7f6", "#2775ca"], ["Trading bots", "#e8e0f6", "#7e57c2"], ["Data pipelines", "#e2efe5", "#2f8f5b"],
+  ["DAO operations", "#fbe7dd", "#e07a3f"], ["Inference apps", "#f6e2ea", "#c0496f"], ["Dev tooling", "#e7eaee", "#5b6472"],
+  ["API marketplaces", "#e3f0ef", "#2f8f8f"], ["Content agents", "#efeada", "#b08900"], ["Onchain analysts", "#dfe9f4", "#2f6fce"],
+  ["Autonomous shoppers", "#f5e3da", "#d2683f"], ["Voice assistants", "#e6e2f3", "#6d5bd0"], ["Monitoring agents", "#e1efe2", "#3a9d6a"],
 ];
 
-function CatTile({ label, c }: { label: string; c: string }) {
+function CatTile({ label, c, accent }: { label: string; c: string; accent: string }) {
   return (
     <div className="cat">
-      <span className="sq" style={{ background: `linear-gradient(135deg,${c},#fff)` }} />
+      <span className="sq" style={{ background: `linear-gradient(135deg,${c},#fff)`, color: accent }}>
+        {CAT_ICONS[label]}
+      </span>
       <span>{label}</span>
     </div>
   );
@@ -89,6 +113,52 @@ const FAQ_ITEMS: [string, string][] = [
 
 const NAV_SECTIONS = ["why", "who", "features", "reserve"] as const;
 
+/**
+ * First-load intro: the Covenant mark centered with light orbiting around it,
+ * then the whole overlay fades + lifts away to reveal the landing. Self-removing
+ * and honors prefers-reduced-motion (skips straight to the page).
+ */
+function Intro() {
+  const [done, setDone] = React.useState(false); // start exit fade
+  const [gone, setGone] = React.useState(false); // unmount
+
+  React.useEffect(() => {
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setGone(true);
+      return;
+    }
+    document.body.classList.add("intro-lock");
+    const t1 = setTimeout(() => setDone(true), 2000); // begin fade-out
+    const t2 = setTimeout(() => {
+      setGone(true);
+      document.body.classList.remove("intro-lock");
+    }, 2750); // unmount after fade
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      document.body.classList.remove("intro-lock");
+    };
+  }, []);
+
+  if (gone) return null;
+  return (
+    <div className={`intro${done ? " done" : ""}`} aria-hidden="true">
+      <div className="intro-stage">
+        <span className="intro-glow" />
+        <span className="intro-ring" />
+        <span className="intro-ring r2" />
+        <span className="intro-logo">
+          <CovenantMark size={66} />
+        </span>
+      </div>
+      <span className="intro-word">Covenant</span>
+    </div>
+  );
+}
+
 export default function Landing() {
   const [view, setView] = React.useState<"user" | "agent">("user");
   const [openFaq, setOpenFaq] = React.useState(0);
@@ -111,8 +181,42 @@ export default function Landing() {
     return () => io.disconnect();
   }, []);
 
+  // Reveal elements as they scroll into view, and hide them again when they
+  // leave (bidirectional). The observer toggles `.in` on every crossing.
+  React.useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>(".landing .reveal"));
+    if (!els.length) return;
+    if (typeof IntersectionObserver === "undefined") {
+      els.forEach((el) => el.classList.add("in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => e.target.classList.toggle("in", e.isIntersecting));
+      },
+      { threshold: 0.15, rootMargin: "-6% 0px -16% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // Bento cards live behind a display:none tab toggle, so the observer can't
+  // see the inactive tab. On an actual tab switch (not first mount), force the
+  // now-visible cards revealed so a hidden tab never leaves a card stuck.
+  const firstView = React.useRef(true);
+  React.useEffect(() => {
+    if (firstView.current) {
+      firstView.current = false;
+      return;
+    }
+    document
+      .querySelectorAll(`.landing .bento[data-view="${view}"] .reveal`)
+      .forEach((el) => el.classList.add("in"));
+  }, [view]);
+
   return (
     <div className="landing">
+      <Intro />
       {/* ============ NAV ============ */}
       <header className="nav">
         <div className="wrap nav-inner">
@@ -134,7 +238,7 @@ export default function Landing() {
       {/* ============ HERO ============ */}
       <section className="hero" id="top">
         <div className="wrap hero-grid">
-          <div className="hero-copy">
+          <div className="hero-copy reveal">
             <div className="badge"><span className="dot" /> Best x402 + ERC-7710 · Private beta</div>
             <h1 className="display hero-h">Let <i>a</i>gents p<i>a</i>y. But only und<i>e</i>r cov<i>e</i>nant.</h1>
             <p className="hero-sub">Grant limited spending permissions to autonomous AI agents (budget, duration, allowed services, purpose), all enforced before a single payment ever executes.</p>
@@ -155,7 +259,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="hero-visual">
+          <div className="hero-visual reveal" style={{ "--rd": ".12s" } as React.CSSProperties}>
             <div className="cov-card">
               <div className="cov-top">
                 <div className="cov-top-row">
@@ -193,7 +297,7 @@ export default function Landing() {
 
       {/* ============ TRUST STRIP ============ */}
       <div className="trust">
-        <div className="wrap trust-inner">
+        <div className="wrap trust-inner reveal">
           <span className="lbl">Composed for the agent economy</span>
           <b>MetaMask Smart Accounts</b>
           <b>ERC-7710 Delegation</b>
@@ -206,12 +310,12 @@ export default function Landing() {
       {/* ============ WHY ============ */}
       <section className="sec" id="why">
         <div className="wrap">
-          <div className="sec-head">
+          <div className="sec-head reveal">
             <h2 className="display sec-h">B<i>e</i>cause giving an agent your wall<i>e</i>t shouldn&apos;t be <i>a</i>ll or nothing</h2>
             <p>We&apos;ve watched agents overspend, pay the wrong service, and double-charge. So we built the boundary that should have existed first.</p>
           </div>
           <div className="why-cards">
-            <div className="why-card">
+            <div className="why-card reveal">
               <div className="fx fx1" aria-hidden="true">
                 <b className="orb o1" /><b className="orb o2" /><b className="orb o3" /><b className="orb o4" />
                 <i className="seal-ring" />
@@ -220,7 +324,7 @@ export default function Landing() {
               <h3>One Covenant for Everything</h3>
               <p>Budget, duration, allowed services, max-per-request and purpose, defined once in a single signed agreement.</p>
             </div>
-            <div className="why-card">
+            <div className="why-card reveal" style={{ "--rd": ".1s" } as React.CSSProperties}>
               <div className="fx fx2" aria-hidden="true">
                 <div className="track2">
                   <span className="gate" />
@@ -232,7 +336,7 @@ export default function Landing() {
               <h3>Spend Within the Rules</h3>
               <p>Every x402 request is checked against your policy (price, service, purpose, duplicates) before it can execute.</p>
             </div>
-            <div className="why-card">
+            <div className="why-card reveal" style={{ "--rd": ".2s" } as React.CSSProperties}>
               <div className="fx fx3" aria-hidden="true">
                 <div className="log">
                   <div className="logrow l1"><span className="lt"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span><i className="lb" /></div>
@@ -245,17 +349,17 @@ export default function Landing() {
             </div>
           </div>
 
-          <h3 className="display cats-title" id="who">F<i>o</i>r every kind <i>o</i>f <i>a</i>gent</h3>
+          <h3 className="display cats-title reveal" id="who">F<i>o</i>r every kind <i>o</i>f <i>a</i>gent</h3>
         </div>
 
-        <div className="marquee">
+        <div className="marquee reveal">
           <div className="track a">
-            {[...cats, ...cats].map(([label, c], i) => <CatTile key={`a${i}`} label={label} c={c} />)}
+            {[...cats, ...cats].map(([label, c, accent], i) => <CatTile key={`a${i}`} label={label} c={c} accent={accent} />)}
           </div>
           <div className="track b">
             {(() => {
               const rev = [...cats].reverse();
-              return [...rev, ...rev].map(([label, c], i) => <CatTile key={`b${i}`} label={label} c={c} />);
+              return [...rev, ...rev].map(([label, c, accent], i) => <CatTile key={`b${i}`} label={label} c={c} accent={accent} />);
             })()}
           </div>
         </div>
@@ -264,16 +368,16 @@ export default function Landing() {
       {/* ============ FEATURES ============ */}
       <section className="feat" id="features">
         <div className="wrap sec">
-          <h2 className="display">We h<i>a</i>ndle the bound<i>a</i>ries, your <i>a</i>gent does the work</h2>
-          <p className="lead">Whether you&apos;re setting the rules or running the task, every step is designed to stay inside the covenant.</p>
-          <div className="toggle">
+          <h2 className="display reveal">We h<i>a</i>ndle the bound<i>a</i>ries, your <i>a</i>gent does the work</h2>
+          <p className="lead reveal" style={{ "--rd": ".08s" } as React.CSSProperties}>Whether you&apos;re setting the rules or running the task, every step is designed to stay inside the covenant.</p>
+          <div className="toggle reveal">
             <button className={view === "user" ? "on" : undefined} onClick={() => setView("user")}>For the user</button>
             <button className={view === "agent" ? "on" : undefined} onClick={() => setView("agent")}>For the agent</button>
           </div>
 
           {/* USER VIEW */}
-          <div className="bento" style={{ display: view === "user" ? "grid" : "none" }}>
-            <div className="bcard b-grey">
+          <div className="bento" data-view="user" style={{ display: view === "user" ? "grid" : "none" }}>
+            <div className="bcard reveal b-grey">
               <h3>Covenant Builder</h3>
               <p>Set the agent, token, budget, duration, limits and purpose. Sign once.</p>
               <div className="stage">
@@ -287,7 +391,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-lilac">
+            <div className="bcard reveal b-lilac">
               <h3>Policy Decision Panel</h3>
               <p>Watch each request approved, blocked, or escalated, in real time.</p>
               <div className="stage">
@@ -300,7 +404,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-mint">
+            <div className="bcard reveal b-mint">
               <h3>Revoke &amp; Expiry</h3>
               <p>See at a glance whether a covenant is active, expired, depleted or revoked.</p>
               <div className="stage">
@@ -315,7 +419,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-peach">
+            <div className="bcard reveal b-peach">
               <h3>Audit Dashboard</h3>
               <p>Reason, cost, service, permission and tx hash for every move the agent made.</p>
               <div className="stage">
@@ -331,8 +435,8 @@ export default function Landing() {
           </div>
 
           {/* AGENT VIEW */}
-          <div className="bento" style={{ display: view === "agent" ? "grid" : "none" }}>
-            <div className="bcard b-lilac">
+          <div className="bento" data-view="agent" style={{ display: view === "agent" ? "grid" : "none" }}>
+            <div className="bcard reveal b-lilac">
               <h3>Task Console</h3>
               <p>Receive a plain-language task and turn it into a plan within policy.</p>
               <div className="stage">
@@ -346,7 +450,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-grey">
+            <div className="bcard reveal b-grey">
               <h3>x402 Request Handler</h3>
               <p>Parse the 402 Payment Required response and extract payment metadata.</p>
               <div className="stage">
@@ -358,7 +462,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-peach">
+            <div className="bcard reveal b-peach">
               <h3>Delegated Execution</h3>
               <p>Settle the payment with delegated permission. No full wallet access.</p>
               <div className="stage">
@@ -370,7 +474,7 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div className="bcard b-mint">
+            <div className="bcard reveal b-mint">
               <h3>Final Report</h3>
               <p>Use the paid resource to generate the answer, then hand back the receipt.</p>
               <div className="stage">
@@ -389,8 +493,8 @@ export default function Landing() {
       {/* ============ RESERVE ============ */}
       <section className="sec" id="reserve">
         <div className="wrap faq-wrap">
-          <h2 className="display">Quick <i>a</i>nswers bef<i>o</i>re you start</h2>
-            <dl className="faq">
+          <h2 className="display reveal">Quick <i>a</i>nswers bef<i>o</i>re you start</h2>
+            <dl className="faq reveal">
               {FAQ_ITEMS.map(([q, a], i) => (
                 <React.Fragment key={i}>
                   <dt
@@ -429,12 +533,12 @@ export default function Landing() {
           ))}
         </div>
         <div className="wrap">
-          <div className="cta-logo">
+          <div className="cta-logo reveal">
             <CovenantMark size={30} />
           </div>
-          <h2 className="display">R<i>e</i>ady to let your <i>a</i>gents p<i>a</i>y, saf<i>e</i>ly?</h2>
-          <p>It runs on Base Sepolia today. Connect your wallet, sign a covenant, and let your agent pay, safely.</p>
-          <div className="cta-actions">
+          <h2 className="display reveal">R<i>e</i>ady to let your <i>a</i>gents p<i>a</i>y, saf<i>e</i>ly?</h2>
+          <p className="reveal" style={{ "--rd": ".08s" } as React.CSSProperties}>It runs on Base Sepolia today. Connect your wallet, sign a covenant, and let your agent pay, safely.</p>
+          <div className="cta-actions reveal" style={{ "--rd": ".12s" } as React.CSSProperties}>
             <Link className="btn btn-dark btn-lg" href="/new">
               Get Started{" "}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -453,7 +557,7 @@ export default function Landing() {
       {/* ============ FOOTER ============ */}
       <footer>
         <div className="wrap">
-          <div className="foot-grid">
+          <div className="foot-grid reveal">
             <div className="foot-brand">
               <CovenantMark size={34} className="mark" />
               <p className="foot-note">Covenant controls how agents spend. The safety layer for the autonomous agent economy. <a href="#top">Built for the x402 + ERC-7710 track.</a></p>
@@ -471,7 +575,7 @@ export default function Landing() {
               <Link href="/new">Create a covenant</Link>
             </div>
           </div>
-          <div className="foot-bottom">
+          <div className="foot-bottom reveal">
             <span>© 2026 Covenant. Let agents pay, but only under covenant.</span>
             <div className="foot-social">
               <a href="#" aria-label="X"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M18 3h3l-7 8 8 10h-6l-5-6-5 6H3l8-9L3 3h6l4 5 5-5z" /></svg></a>
