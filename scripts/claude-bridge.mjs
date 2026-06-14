@@ -42,12 +42,25 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { timingSafeEqual } from "node:crypto";
 
 const PORT = Number(process.env.BRIDGE_PORT || 8787);
 const HOST = process.env.BRIDGE_HOST || "127.0.0.1";
 const CLAUDE_BIN = process.env.CLAUDE_BIN || "claude";
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "";
+// When set, every /chat/completions call must send `Authorization: Bearer <BRIDGE_TOKEN>`.
+// REQUIRED if you expose this bridge via a public URL (e.g. cloudflared). The app sends
+// this header as `Bearer ${VENICE_API_KEY}`, so set VENICE_API_KEY === BRIDGE_TOKEN.
+const TOKEN = process.env.BRIDGE_TOKEN || "";
 const NO_TOOLS = "Bash Edit Write Read Glob Grep WebFetch WebSearch NotebookEdit Task".split(" ");
+
+/** Constant-time check of the Authorization bearer token. Open when TOKEN unset (localhost dev). */
+function authOk(req) {
+  if (!TOKEN) return true;
+  const got = Buffer.from(req.headers.authorization || "");
+  const want = Buffer.from(`Bearer ${TOKEN}`);
+  return got.length === want.length && timingSafeEqual(got, want);
+}
 
 /**
  * Resolve the Claude executable. On Windows, Node's spawn (no shell) does NOT
@@ -140,6 +153,10 @@ const server = createServer(async (req, res) => {
     res.writeHead(404, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ error: "not found" }));
   }
+  if (!authOk(req)) {
+    res.writeHead(401, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({ error: "unauthorized" }));
+  }
 
   try {
     const body = JSON.parse((await readBody(req)) || "{}");
@@ -169,5 +186,5 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`[claude-bridge] listening on http://${HOST}:${PORT}  (bin: ${CLAUDE}${CLAUDE_MODEL ? `, model: ${CLAUDE_MODEL}` : ""})`);
-  console.log(`[claude-bridge] set VENICE_BASE_URL=http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT} and VENICE_API_KEY=local`);
+  console.log(`[claude-bridge] auth: ${TOKEN ? "ON (Bearer token required)" : "OFF (localhost only — set BRIDGE_TOKEN before exposing publicly)"}`);
 });
