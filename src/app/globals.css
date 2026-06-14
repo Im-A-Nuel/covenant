@@ -1072,8 +1072,11 @@ body.intro-lock{overflow:hidden;}
 }
 @media(max-width:560px){
   .landing .wrap{padding:0 18px;}
-  .landing .nav-inner{height:62px;gap:12px;}
-  .landing .nav-app{display:none;} /* declutter phone nav; dashboard reachable via footer + hero */
+  .landing .nav-inner{height:62px;gap:10px;}
+  /* keep Open app reachable on phones, but icon-only so it fits next to Connect Wallet */
+  .landing .nav-app{padding:9px 11px;gap:0;}
+  .landing .nav-app .nav-app-label{display:none;}
+  .landing .wallet-btn{padding:10px 14px;}
   .landing .hero{padding:40px 0 56px;}
   .landing h1.hero-h{font-size:33px;}
   .landing .hero-sub{font-size:15.5px;}
